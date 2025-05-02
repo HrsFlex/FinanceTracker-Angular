@@ -16,17 +16,17 @@ interface Category {
   styleUrls: ['./category-list.component.css'],
 })
 export class CategoryListComponent implements OnInit {
-  categories: Category[] = [];
-  currentPage = 1;
-  pageSize = 7;
-  totalItems = 0;
-  totalPages = 1;
-  sortField: keyof Category = 'name';
-  sortDirection: 'asc' | 'desc' = 'asc';
+  public categories: Category[] = [];
+  public currentPage = 1;
+  public pageSize = 10;
+  public totalItems = 0;
+  public totalPages = 1;
+  public sortField: keyof Category = 'name';
+  public sortDirection: 'asc' | 'desc' = 'asc';
 
   constructor(private categoryService: CategoryService) {}
 
-  ngOnInit(): void {
+  public ngOnInit(): void {
     this.loadCategories();
 
     this.categoryService
@@ -42,7 +42,7 @@ export class CategoryListComponent implements OnInit {
     this.loadCategories();
   }
 
-  loadCategories(): void {
+  public loadCategories(): void {
     this.categoryService
       .getCategories(
         this.currentPage,
@@ -62,13 +62,13 @@ export class CategoryListComponent implements OnInit {
         },
       });
   }
-  onPageChange(event: any): void {
+  public onPageChange(event: any): void {
     this.pageSize = event.pageSize;
     this.currentPage = event.pageIndex + 1; // MatPaginator is zero-based
     this.loadCategories();
   }
 
-  sort(field: keyof Category): void {
+  public sort(field: keyof Category): void {
     if (this.sortField === field) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -78,7 +78,7 @@ export class CategoryListComponent implements OnInit {
     this.resetAndReload();
   }
 
-  changePage(page: number): void {
+  public changePage(page: number): void {
     if (page < 1 || page > this.totalPages) return;
     this.currentPage = page;
     this.loadCategories();

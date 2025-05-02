@@ -2,6 +2,16 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from 'src/enviroments/environment';
+
+// Define the Category interface
+interface Category {
+  id?: string;
+  name: string;
+  description: string;
+  createdDate?: string;
+  updatedDate?: string;
+}
 
 @Component({
   selector: 'app-category-upsert',
@@ -12,7 +22,7 @@ export class CategoryUpsertComponent implements OnInit {
   categoryForm: FormGroup;
   isEditing = false;
   categoryId: string | null = null;
-  private apiUrl = 'http://localhost:3000/categories';
+  private apiUrl = environment.apiUrlCat;
 
   constructor(
     private http: HttpClient,
@@ -25,7 +35,7 @@ export class CategoryUpsertComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
     this.categoryId = idParam;
 
@@ -35,10 +45,10 @@ export class CategoryUpsertComponent implements OnInit {
     }
   }
 
-  loadCategory() {
-    if (!this.categoryId) return;
+  public loadCategory() {
+    // if (!this.categoryId) return;
 
-    this.http.get<any>(`${this.apiUrl}/${this.categoryId}`).subscribe(
+    this.http.get<Category>(`${this.apiUrl}/${this.categoryId}`).subscribe(
       (category) => {
         this.categoryForm.patchValue(category);
       },
@@ -46,7 +56,7 @@ export class CategoryUpsertComponent implements OnInit {
     );
   }
 
-  addCategory() {
+  public addCategory() {
     if (this.categoryForm.invalid) return;
 
     const today = new Date().toISOString().split('T')[0];
@@ -72,7 +82,7 @@ export class CategoryUpsertComponent implements OnInit {
     );
   }
 
-  cancelEdit() {
+  public cancelEdit() {
     this.router.navigate(['/category-list']);
   }
 }

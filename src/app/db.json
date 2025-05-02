@@ -64,13 +64,6 @@
       "updatedDate": "2025-05-01"
     },
     {
-      "id": "3907",
-      "name": "UPI",
-      "description": "traveling",
-      "createdDate": "2025-05-01",
-      "updatedDate": "2025-05-01"
-    },
-    {
       "id": "082b",
       "name": "UPI",
       "description": "Shopping",
@@ -78,9 +71,9 @@
       "updatedDate": "2025-05-01"
     },
     {
-      "id": "c1a7",
-      "name": "UPI",
-      "description": "Tea",
+      "id": "8858",
+      "name": "Net Banking",
+      "description": "Amazon Shopping",
       "createdDate": "2025-05-02",
       "updatedDate": "2025-05-02"
     }

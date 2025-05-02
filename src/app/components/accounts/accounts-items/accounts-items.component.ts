@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import {
   Accounts,
   AccountServiceService,
@@ -10,7 +10,7 @@ import { debounceTime } from 'rxjs/operators';
   templateUrl: './accounts-items.component.html',
   styleUrls: ['./accounts-items.component.css'],
 })
-export class AccountsItemsComponent {
+export class AccountsItemsComponent implements OnInit {
   public accounts: Accounts[] = [];
   public currentPage = 1;
   public pageSize = 10;
@@ -59,9 +59,12 @@ export class AccountsItemsComponent {
   }
 
   public sort(field: keyof Accounts): void {
-    this.sortField = field;
-    this.sortDirection =
-      this.sortField === field && this.sortDirection === 'asc' ? 'desc' : 'asc';
+    if (this.sortField === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortField = field;
+      this.sortDirection = 'asc';
+    }
     this.resetAndReload();
   }
 
@@ -71,7 +74,7 @@ export class AccountsItemsComponent {
     this.loadAccounts();
   }
 
-  public removeAccounts(id: number): void {
+  public removeAccounts(id: any): void {
     this.accountsService.deleteAccounts(id).subscribe({
       next: () => {
         this.accountsService.notifyAccountsChanged();

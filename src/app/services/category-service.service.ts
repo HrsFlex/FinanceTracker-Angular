@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from 'src/enviroments/environment';
 
 interface Category {
   id?: number;
@@ -15,14 +16,14 @@ interface Category {
   providedIn: 'root',
 })
 export class CategoryService {
-  private apiUrl = 'http://localhost:3000/categories';
-  private categoryChanged$ = new Subject<void>();
+  private apiUrl = environment.apiUrlCat;
+  private categoryChanged = new Subject<void>();
 
   constructor(private http: HttpClient) {}
 
-  getCategories(
+  public getCategories(
     page: number,
-    size: number,
+    size: number, //if need to implement pagination
     sortField: keyof Category,
     sortDirection: 'asc' | 'desc'
   ): Observable<{ categories: Category[]; totalItems: number }> {
@@ -45,27 +46,15 @@ export class CategoryService {
       );
   }
 
-  getCategory(id: string): Observable<Category> {
-    return this.http.get<Category>(`${this.apiUrl}/${id}`);
-  }
-
-  addCategory(category: Category): Observable<Category> {
-    return this.http.post<Category>(this.apiUrl, category);
-  }
-
-  updateCategory(id: string, category: Category): Observable<Category> {
-    return this.http.put<Category>(`${this.apiUrl}/${id}`, category);
-  }
-
-  deleteCategory(id: number): Observable<void> {
+  public deleteCategory(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 
-  notifyCategoryChanged(): void {
-    this.categoryChanged$.next();
+  public notifyCategoryChanged(): void {
+    this.categoryChanged.next();
   }
 
-  onCategoryChanged(): Observable<void> {
-    return this.categoryChanged$.asObservable();
+  public onCategoryChanged(): Observable<void> {
+    return this.categoryChanged.asObservable();
   }
 }

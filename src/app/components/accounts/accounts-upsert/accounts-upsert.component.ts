@@ -1,7 +1,9 @@
+import { Accounts } from 'src/app/services/account-service.service';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
+import { environment } from 'src/enviroments/environment';
 
 @Component({
   selector: 'app-accounts-upsert',
@@ -12,21 +14,20 @@ export class AccountsUpsertComponent implements OnInit {
   accountsForm: FormGroup;
   isEditing = false;
   accountsId: string | null = null;
-  private apiUrl = 'http://localhost:3000/accounts';
+  private apiUrl = environment.apiUrlAcc;
 
   constructor(
-    private fb: FormBuilder,
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.accountsForm = this.fb.group({
-      name: ['', Validators.required],
-      description: ['', Validators.required],
+    this.accountsForm = new FormGroup({
+      name: new FormControl('', Validators.required),
+      description: new FormControl('', Validators.required),
     });
   }
 
-  ngOnInit() {
+  public ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');
     this.accountsId = idParam;
 
@@ -36,20 +37,17 @@ export class AccountsUpsertComponent implements OnInit {
     }
   }
 
-  loadAccounts() {
-    if (!this.accountsId) return;
+  public loadAccounts() {
+    // if (!this.accountsId) return;
 
-    this.http.get<any>(`${this.apiUrl}/${this.accountsId}`).subscribe(
+    this.http.get<Accounts>(`${this.apiUrl}/${this.accountsId}`).subscribe(
       (accounts) => {
-        this.accountsForm.patchValue({
-          name: accounts.name,
-          description: accounts.description,
-        });
-      }
-      // (error) => console.error('Error loading account:', error)
+        this.accountsForm.patchValue(accounts);
+      },
+      (error) => console.error('Error loading account:', error)
     );
   }
-  addAccounts() {
+  public addAccounts() {
     if (this.accountsForm.invalid) return;
 
     const today = new Date().toISOString().split('T')[0];
