@@ -1,0 +1,49 @@
+.container {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+}
+.form-group {
+  margin-bottom: 15px;
+}
+input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.error {
+  color: red;
+  font-size: 0.9em;
+}
+button {
+  padding: 8px 16px;
+  margin-right: 10px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.bg-sky-600 {
+  background-color: #2563eb;
+}
+.bg-sky-300 {
+  background-color: #7dd3fc;
+}
+.bg-gray-500 {
+  background-color: #6b7280;
+}
+.bg-gray-400 {
+  background-color: #6b7280;
+}
+.text-white {
+  color: white;
+}
+.font-semibold {
+  font-weight: 600;
+}
+hover\:bg-sky-700:hover {
+  background-color: #1e40af;
+}
+hover\:bg-gray-600:hover {
+  background-color: #4b5563;
+}

@@ -1,0 +1,140 @@
+<div class="max-w-6xl mx-auto bg-white p-8 rounded-xl shadow-md space-y-6">
+  <div class="flex justify-between items-center">
+    <h2 class="text-3xl font-bold text-sky-700">Categories</h2>
+    <a
+      [routerLink]="['/category-upsert']"
+      class="bg-green-600 text-white font-medium px-4 py-2 rounded hover:bg-green-700 transition"
+      >+ Add Category</a
+    >
+  </div>
+
+  <div class="overflow-x-auto">
+    <table
+      class="min-w-full text-sky-900 text-left border border-sky-200 rounded"
+    >
+      <thead>
+        <tr class="bg-sky-100 text-sky-700">
+          <th class="p-3 border-b border-sky-300">#</th>
+
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('name')"
+          >
+            Name
+            <span class="ml-1">
+              {{
+                sortField === "name"
+                  ? sortDirection === "asc"
+                    ? "⇅"
+                    : "⇅"
+                  : "⇅"
+              }}
+            </span>
+          </th>
+
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('description')"
+          >
+            Description
+            <span class="ml-1">
+              {{
+                sortField === "description"
+                  ? sortDirection === "asc"
+                    ? "⇅"
+                    : "↓"
+                  : "⇅"
+              }}
+            </span>
+          </th>
+
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('createdDate')"
+          >
+            Created Date
+            <span class="ml-1">
+              {{
+                sortField === "createdDate"
+                  ? sortDirection === "asc"
+                    ? "⇅"
+                    : "↓"
+                  : "⇅"
+              }}
+            </span>
+          </th>
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('updatedDate')"
+          >
+            Updated Date
+            <span class="ml-1">
+              {{
+                sortField === "updatedDate"
+                  ? sortDirection === "asc"
+                    ? "⇅"
+                    : "↓"
+                  : "⇅"
+              }}
+            </span>
+          </th>
+          <th class="p-3 border-b border-sky-300">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr
+          *ngFor="let category of categories; let i = index"
+          class="hover:bg-sky-50"
+        >
+          <td class="p-3 border-t border-sky-200">
+            {{ (currentPage - 1) * pageSize + i + 1 }}
+          </td>
+          <td class="p-3 border-t border-sky-200">{{ category.name }}</td>
+          <td class="p-3 border-t border-sky-200">
+            {{ category.description || "2025-04-30" }}
+          </td>
+          <td class="p-3 border-t border-sky-200">
+            {{ category.createdDate || "2025-04-30" }}
+          </td>
+          <td class="p-3 border-t border-sky-200">
+            {{ category.updatedDate || "2025-04-30" }}
+          </td>
+          <td class="p-3 border-t border-sky-200 space-x-2">
+            <a
+              [routerLink]="['/category-upsert', category.id]"
+              class="inline-block bg-sky-600 text-white px-3 py-1 rounded hover:bg-sky-700 transition"
+              >Edit</a
+            >
+            <button
+              (click)="removeCategory(category.id)"
+              class="inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="flex justify-between items-center pt-4">
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+      class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:bg-sky-300"
+    >
+      Previous
+    </button>
+    <span class="text-sky-900 font-medium">
+      Page {{ currentPage }} of {{ totalPages }}
+    </span>
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+      class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:bg-sky-300"
+    >
+      Next
+    </button>
+  </div>
+</div>

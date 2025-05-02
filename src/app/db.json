@@ -1,0 +1,88 @@
+{
+  "categories": [
+    {
+      "id": "0c19",
+      "name": "Travel",
+      "description": "Leaf Village",
+      "createdDate": "2025-04-30",
+      "updatedDate": "2025-04-30"
+    },
+    {
+      "id": "d8bf",
+      "name": "Jobs",
+      "description": "Full time\n",
+      "createdDate": "2025-04-30",
+      "updatedDate": "2025-04-30"
+    },
+    {
+      "id": "3b9a",
+      "name": "Internship",
+      "description": "Google",
+      "createdDate": "2025-04-30",
+      "updatedDate": "2025-04-30"
+    },
+    {
+      "name": "Jobs",
+      "description": "intern",
+      "updatedDate": "2025-05-02",
+      "id": "819d"
+    }
+  ],
+  "accounts": [
+    {
+      "id": "0c19",
+      "name": "Cash",
+      "description": "Cash Money",
+      "createdDate": "2025-04-30",
+      "updatedDate": "2025-04-30"
+    },
+    {
+      "name": "Bank",
+      "description": "State Bank India ",
+      "updatedDate": "2025-05-02",
+      "id": "d8bf"
+    },
+    {
+      "id": "b618",
+      "name": "Cheque",
+      "description": "PNB",
+      "createdDate": "2025-04-30",
+      "updatedDate": "2025-04-30"
+    },
+    {
+      "id": "3b9a",
+      "name": "Card",
+      "description": "Visa",
+      "createdDate": "2025-04-30",
+      "updatedDate": "2025-04-30"
+    },
+    {
+      "id": "aa6e",
+      "name": "CASH",
+      "description": "travling",
+      "createdDate": "2025-05-01",
+      "updatedDate": "2025-05-01"
+    },
+    {
+      "id": "3907",
+      "name": "UPI",
+      "description": "traveling",
+      "createdDate": "2025-05-01",
+      "updatedDate": "2025-05-01"
+    },
+    {
+      "id": "082b",
+      "name": "UPI",
+      "description": "Shopping",
+      "createdDate": "2025-05-01",
+      "updatedDate": "2025-05-01"
+    },
+    {
+      "id": "c1a7",
+      "name": "UPI",
+      "description": "Tea",
+      "createdDate": "2025-05-02",
+      "updatedDate": "2025-05-02"
+    }
+  ]
+}

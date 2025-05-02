@@ -1,0 +1,81 @@
+<div class="min-h-screen flex items-center justify-center bg-sky-50">
+  <div
+    class="flex flex-col gap-6 bg-white p-8 rounded-xl shadow-lg w-full max-w-md"
+  >
+    <h2 class="text-3xl font-bold text-sky-700 text-center">
+      {{ isEditing ? "Edit Account" : "Add Account" }}
+    </h2>
+    <form [formGroup]="accountsForm" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-2">
+        <label for="name" class="text-sky-900 font-semibold"
+          >Account Name</label
+        >
+        <input
+          id="name"
+          formControlName="name"
+          type="text"
+          placeholder="Enter Account Name"
+          class="w-full p-3 border border-sky-200 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sky-900"
+          [ngClass]="{
+            'border-red-500':
+              accountsForm.get('name')?.invalid &&
+              accountsForm.get('name')?.touched
+          }"
+        />
+        <div
+          *ngIf="
+            accountsForm.get('name')?.invalid &&
+            accountsForm.get('name')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Account name is required
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="description" class="text-sky-900 font-semibold"
+          >Description</label
+        >
+        <textarea
+          id="description"
+          formControlName="description"
+          placeholder="Enter description"
+          class="w-full p-3 border border-sky-200 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sky-900 resize-y"
+          rows="4"
+          [ngClass]="{
+            'border-red-500':
+              accountsForm.get('description')?.invalid &&
+              accountsForm.get('description')?.touched
+          }"
+        ></textarea>
+        <div
+          *ngIf="
+            accountsForm.get('description')?.invalid &&
+            accountsForm.get('description')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Description is required
+        </div>
+      </div>
+
+      <div class="flex justify-center gap-3">
+        <button
+          (click)="addAccounts()"
+          [disabled]="accountsForm.pristine || accountsForm.invalid"
+          class="bg-sky-600 text-white font-semibold py-2 px-4 rounded hover:bg-sky-700 disabled:bg-gray-400"
+        >
+          {{ isEditing ? "Update" : "Add" }} Category
+        </button>
+
+        <button
+          (click)="cancelEdit()"
+          class="bg-gray-400 text-white font-semibold py-2 px-4 rounded hover:bg-gray-500"
+        >
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
