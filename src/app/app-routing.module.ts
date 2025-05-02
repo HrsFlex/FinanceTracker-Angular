@@ -5,6 +5,7 @@ import { CategoryListComponent } from './components/category/category-list/categ
 import { CategoryUpsertComponent } from './components/category/category-upsert/category-upsert.component';
 import { AccountsItemsComponent } from './components/accounts/accounts-items/accounts-items.component';
 import { AccountsUpsertComponent } from './components/accounts/accounts-upsert/accounts-upsert.component';
+import { HomeComponent } from './pages/home/home.component';
 
 const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -14,6 +15,7 @@ const routes: Routes = [
   { path: 'accounts-items', component: AccountsItemsComponent },
   { path: 'accounts-upsert', component: AccountsUpsertComponent },
   { path: 'accounts-upsert/:id', component: AccountsUpsertComponent },
+  { path: 'app-home', component: HomeComponent },
 ];
 
 @NgModule({

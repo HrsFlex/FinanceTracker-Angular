@@ -5,33 +5,30 @@ import { User } from '../interfaces/models/user.js';
 import { FormGroup } from '@angular/forms';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserService {
   USER: string = 'user';
-  constructor(private router: Router) { }
+  constructor(private router: Router) {}
 
-  addUser(name : string) {
-    const user : User = {
-      id:uuidv4(),
+  addUser(name: string) {
+    const user: User = {
+      id: uuidv4(),
       name: name,
-    }
-    localStorage.setItem(this.USER,JSON.stringify(user));
+    };
+    localStorage.setItem(this.USER, JSON.stringify(user));
   }
 
-  getUser() : User {
+  getUser(): User {
     return JSON.parse(localStorage.getItem(this.USER) || '{}') as User;
   }
 
   deleteUserAccount() {
     localStorage.removeItem(this.USER);
-    this.router.navigateByUrl('/login');
-
+    this.router.navigateByUrl('');
   }
 
-  isLoggedin(){
-    return Object.keys(this.getUser()).length > 0 ;
+  isLoggedin() {
+    return Object.keys(this.getUser()).length > 0;
   }
-
-
 }

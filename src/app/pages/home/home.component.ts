@@ -1,16 +1,11 @@
-// import { Component } from '@angular/core';
-// import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { UserService } from 'src/app/services/user.service';
 
-// @Component({
-//   selector: 'app-home',
-//   templateUrl: './home.component.html',
-//   styleUrls: ['./home.component.css']
-// })
-// export class HomeComponent implements OnInit {
-
-//   budgetForm: FormGroup = new FormGroup({
-//     name: new FormControl('', [Validators.required]),
-//     budget: new FormControl(null, [Validators.required])
-//   })
-
-// }
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css'],
+})
+export class HomeComponent {
+  constructor(public userService: UserService) {}
+}

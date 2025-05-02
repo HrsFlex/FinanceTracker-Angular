@@ -6,17 +6,16 @@ import { UserService } from 'src/app/services/user.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
-  accountForm : FormGroup = new FormGroup({
-    name : new FormControl('',[Validators.required])
+  accountForm: FormGroup = new FormGroup({
+    name: new FormControl('', [Validators.required]),
   });
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(private userService: UserService, private router: Router) {}
   createAccount() {
     this.userService.addUser(this.accountForm.value.name);
-    this.router.navigateByUrl('');
+    this.router.navigateByUrl('/app-home');
   }
-
 }
