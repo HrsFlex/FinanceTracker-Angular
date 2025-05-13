@@ -4,7 +4,7 @@
     <a
       [routerLink]="['/category-upsert']"
       class="bg-green-600 text-white font-medium px-4 py-2 rounded hover:bg-green-700 transition"
-      >+ Add Category</a
+      >+ Add Categories</a
     >
   </div>
 
@@ -22,13 +22,12 @@
           >
             Name
             <span class="ml-1">
-              {{
-                sortField === "name"
-                  ? sortDirection === "asc"
-                    ? "⇅"
-                    : "⇅"
-                  : "⇅"
-              }}
+              <ng-container *ngIf="sortField === 'name'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-name'">▼</ng-container>
+              <ng-container
+                *ngIf="sortField !== 'name' && sortField !== '-name'"
+                >⇅</ng-container
+              >
             </span>
           </th>
 
@@ -38,13 +37,16 @@
           >
             Description
             <span class="ml-1">
-              {{
-                sortField === "description"
-                  ? sortDirection === "asc"
-                    ? "⇅"
-                    : "↓"
-                  : "⇅"
-              }}
+              <ng-container *ngIf="sortField === 'description'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-description'"
+                >▼</ng-container
+              >
+              <ng-container
+                *ngIf="
+                  sortField !== 'description' && sortField !== '-description'
+                "
+                >⇅</ng-container
+              >
             </span>
           </th>
 
@@ -54,33 +56,42 @@
           >
             Created Date
             <span class="ml-1">
-              {{
-                sortField === "createdDate"
-                  ? sortDirection === "asc"
-                    ? "⇅"
-                    : "↓"
-                  : "⇅"
-              }}
+              <ng-container *ngIf="sortField === 'createdDate'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-createdDate'"
+                >▼</ng-container
+              >
+              <ng-container
+                *ngIf="
+                  sortField !== 'createdDate' && sortField !== '-createdDate'
+                "
+                >⇅</ng-container
+              >
             </span>
           </th>
+
           <th
             class="p-3 border-b border-sky-300 cursor-pointer"
             (click)="sort('updatedDate')"
           >
             Updated Date
             <span class="ml-1">
-              {{
-                sortField === "updatedDate"
-                  ? sortDirection === "asc"
-                    ? "⇅"
-                    : "↓"
-                  : "⇅"
-              }}
+              <ng-container *ngIf="sortField === 'updatedDate'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-updatedDate'"
+                >▼</ng-container
+              >
+              <ng-container
+                *ngIf="
+                  sortField !== 'updatedDate' && sortField !== '-updatedDate'
+                "
+                >⇅</ng-container
+              >
             </span>
           </th>
+
           <th class="p-3 border-b border-sky-300">Actions</th>
         </tr>
       </thead>
+
       <tbody>
         <tr
           *ngFor="let category of categories; let i = index"
@@ -91,13 +102,13 @@
           </td>
           <td class="p-3 border-t border-sky-200">{{ category.name }}</td>
           <td class="p-3 border-t border-sky-200">
-            {{ category.description || "2025-04-30" }}
+            {{ category.description || "N/A" }}
           </td>
           <td class="p-3 border-t border-sky-200">
-            {{ category.createdDate || "2025-04-30" }}
+            {{ category.createdDate || category.updatedDate }}
           </td>
           <td class="p-3 border-t border-sky-200">
-            {{ category.updatedDate || "2025-04-30" }}
+            {{ category.updatedDate }}
           </td>
           <td class="p-3 border-t border-sky-200 space-x-2">
             <a

@@ -3,35 +3,26 @@ import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from 'src/enviroments/environment';
-
-interface Category {
-  id?: number;
-  name: string;
-  description: string;
-  createdDate?: string;
-  updatedDate?: string;
-}
+import { Category } from '../components/category/entity/category-interface';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CategoryService {
-  private apiUrl = environment.apiUrlCat;
+  private apiUrl = environment.baseUrl + '/categories';
   private categoryChanged = new Subject<void>();
 
   constructor(private http: HttpClient) {}
 
   public getCategories(
     page: number,
-    size: number, //if need to implement pagination
-    sortField: keyof Category,
-    sortDirection: 'asc' | 'desc'
+    pageSize: number, //if need to implement pagination
+    sortField: string
   ): Observable<{ categories: Category[]; totalItems: number }> {
     const params = new HttpParams()
       .set('_page', page.toString())
-      .set('_limit', size.toString())
-      .set('_sort', sortField)
-      .set('_order', sortDirection);
+      .set('_limit', pageSize.toString())
+      .set('_sort', sortField);
 
     return this.http
       .get<Category[]>(this.apiUrl, {
@@ -39,10 +30,10 @@ export class CategoryService {
         observe: 'response',
       })
       .pipe(
-        map((res: HttpResponse<Category[]>) => {
-          const totalItems = Number(res.headers.get('X-Total-Count') || '0');
-          return { categories: res.body ?? [], totalItems };
-        })
+        map((response) => ({
+          categories: response.body || [],
+          totalItems: Number(response.headers.get('X-Total-Count')) || 0,
+        }))
       );
   }
 

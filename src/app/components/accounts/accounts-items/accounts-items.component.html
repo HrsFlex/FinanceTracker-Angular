@@ -1,56 +1,127 @@
 <div class="max-w-6xl mx-auto bg-white p-8 rounded-xl shadow-md space-y-6">
   <div class="flex justify-between items-center">
     <h2 class="text-3xl font-bold text-sky-700">Accounts</h2>
-    <a [routerLink]="['/accounts-upsert']" class="bg-green-600 text-white font-medium px-4 py-2 rounded hover:bg-green-700 transition">+ Add Account</a>
+    <a
+      [routerLink]="['/accounts-upsert']"
+      class="bg-green-600 text-white font-medium px-4 py-2 rounded hover:bg-green-700 transition"
+      >+ Add Account</a
+    >
   </div>
 
   <div class="overflow-x-auto">
-    <table class="min-w-full text-sky-900 text-left border border-sky-200 rounded">
+    <table
+      class="min-w-full text-sky-900 text-left border border-sky-200 rounded"
+    >
       <thead>
         <tr class="bg-sky-100 text-sky-700">
           <th class="p-3 border-b border-sky-300">#</th>
 
-          <th class="p-3 border-b border-sky-300 cursor-pointer" (click)="sort('name')">
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('name')"
+          >
             Name
             <span class="ml-1">
-              {{ sortField === 'name' ? (sortDirection === 'asc' ? '⇅' : '⇅') : '⇅' }}
+              <ng-container *ngIf="sortField === 'name'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-name'">▼</ng-container>
+              <ng-container
+                *ngIf="sortField !== 'name' && sortField !== '-name'"
+                >⇅</ng-container
+              >
             </span>
           </th>
 
-          <th class="p-3 border-b border-sky-300 cursor-pointer" (click)="sort('description')">
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('description')"
+          >
             Description
             <span class="ml-1">
-              {{ sortField === 'description' ? (sortDirection === 'asc' ? '⇅' : '↓') : '⇅' }}
+              <ng-container *ngIf="sortField === 'description'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-description'"
+                >▼</ng-container
+              >
+              <ng-container
+                *ngIf="
+                  sortField !== 'description' && sortField !== '-description'
+                "
+                >⇅</ng-container
+              >
             </span>
           </th>
 
-
-          <th class="p-3 border-b border-sky-300 cursor-pointer" (click)="sort('createdDate')">
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('createdDate')"
+          >
             Created Date
             <span class="ml-1">
-              {{ sortField === 'createdDate' ? (sortDirection === 'asc' ? '⇅' : '↓') : '⇅' }}
+              <ng-container *ngIf="sortField === 'createdDate'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-createdDate'"
+                >▼</ng-container
+              >
+              <ng-container
+                *ngIf="
+                  sortField !== 'createdDate' && sortField !== '-createdDate'
+                "
+                >⇅</ng-container
+              >
             </span>
-
           </th>
-          <th class="p-3 border-b border-sky-300 cursor-pointer" (click)="sort('updatedDate')">
+
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('updatedDate')"
+          >
             Updated Date
             <span class="ml-1">
-              {{ sortField === 'updatedDate' ? (sortDirection === 'asc' ? '⇅' : '↓') : '⇅' }}
+              <ng-container *ngIf="sortField === 'updatedDate'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-updatedDate'"
+                >▼</ng-container
+              >
+              <ng-container
+                *ngIf="
+                  sortField !== 'updatedDate' && sortField !== '-updatedDate'
+                "
+                >⇅</ng-container
+              >
             </span>
           </th>
+
           <th class="p-3 border-b border-sky-300">Actions</th>
         </tr>
       </thead>
+
       <tbody>
-        <tr *ngFor="let account of accounts; let i = index" class="hover:bg-sky-50">
-          <td class="p-3 border-t border-sky-200">{{ (currentPage - 1) * pageSize + i + 1 }}</td>
+        <tr
+          *ngFor="let account of accounts; let i = index"
+          class="hover:bg-sky-50"
+        >
+          <td class="p-3 border-t border-sky-200">
+            {{ (currentPage - 1) * pageSize + i + 1 }}
+          </td>
           <td class="p-3 border-t border-sky-200">{{ account.name }}</td>
-          <td class="p-3 border-t border-sky-200">{{ account.description || '2025-04-30' }}</td>
-          <td class="p-3 border-t border-sky-200">{{ account.createdDate || '2025-04-30' }}</td>
-          <td class="p-3 border-t border-sky-200">{{ account.updatedDate || '2025-04-30' }}</td>
+          <td class="p-3 border-t border-sky-200">
+            {{ account.description || "N/A" }}
+          </td>
+          <td class="p-3 border-t border-sky-200">
+            {{ account.createdDate || account.updatedDate }}
+          </td>
+          <td class="p-3 border-t border-sky-200">
+            {{ account.updatedDate }}
+          </td>
           <td class="p-3 border-t border-sky-200 space-x-2">
-            <a [routerLink]="['/accounts-upsert', account.id]" class="inline-block bg-sky-600 text-white px-3 py-1 rounded hover:bg-sky-700 transition">Edit</a>
-            <button (click)="removeAccounts(account.id)" class="inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition">Delete</button>
+            <a
+              [routerLink]="['/accounts-upsert', account.id]"
+              class="inline-block bg-sky-600 text-white px-3 py-1 rounded hover:bg-sky-700 transition"
+              >Edit</a
+            >
+            <button
+              (click)="removeAccounts(account.id)"
+              class="inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
+            >
+              Delete
+            </button>
           </td>
         </tr>
       </tbody>
@@ -59,13 +130,21 @@
 
   <!-- Pagination -->
   <div class="flex justify-between items-center pt-4">
-    <button (click)="changePage(currentPage - 1)" [disabled]="currentPage === 1" class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:bg-sky-300">
+    <button
+      (click)="changePage(currentPage - 1)"
+      [disabled]="currentPage === 1"
+      class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:bg-sky-300"
+    >
       Previous
     </button>
     <span class="text-sky-900 font-medium">
       Page {{ currentPage }} of {{ totalPages }}
     </span>
-    <button (click)="changePage(currentPage + 1)" [disabled]="currentPage === totalPages" class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:bg-sky-300">
+    <button
+      (click)="changePage(currentPage + 1)"
+      [disabled]="currentPage === totalPages"
+      class="px-4 py-2 bg-sky-600 text-white rounded hover:bg-sky-700 disabled:bg-sky-300"
+    >
       Next
     </button>
   </div>

@@ -1,9 +1,9 @@
-import { Accounts } from 'src/app/services/account-service.service';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/enviroments/environment';
+import { Accounts, AccountsForm } from '../entity/account-interface';
 
 @Component({
   selector: 'app-accounts-upsert',
@@ -11,19 +11,27 @@ import { environment } from 'src/enviroments/environment';
   styleUrls: ['./accounts-upsert.component.css'],
 })
 export class AccountsUpsertComponent implements OnInit {
-  accountsForm: FormGroup;
+  accountsForm: FormGroup<AccountsForm>;
   isEditing = false;
   accountsId: string | null = null;
-  private apiUrl = environment.apiUrlAcc;
+  private apiUrl = environment.baseUrl + '/accounts';
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router
   ) {
-    this.accountsForm = new FormGroup({
-      name: new FormControl('', Validators.required),
-      description: new FormControl('', Validators.required),
+    this.accountsForm = new FormGroup<AccountsForm>({
+      name: new FormControl<string>('', Validators.required),
+      description: new FormControl<string>('', Validators.required),
+      initialAmount: new FormControl<number>(0, [
+        Validators.required,
+        Validators.min(0),
+      ]),
+      balance: new FormControl<number>(0, [
+        Validators.required,
+        Validators.min(0),
+      ]),
     });
   }
 
@@ -71,6 +79,13 @@ export class AccountsUpsertComponent implements OnInit {
           }`
         )
     );
+  }
+
+  clearZero(controlName: 'initialAmount' | 'balance') {
+    const control = this.accountsForm.get(controlName);
+    if (control?.value === 0) {
+      control.setValue(null);
+    }
   }
 
   cancelEdit() {

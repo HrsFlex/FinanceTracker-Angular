@@ -1,14 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { debounceTime } from 'rxjs/operators';
 import { CategoryService } from '../../../services/category-service.service';
-
-interface Category {
-  id?: number;
-  name: string;
-  description: string;
-  createdDate?: string;
-  updatedDate?: string;
-}
+import { Category } from '../entity/category-interface';
 
 @Component({
   selector: 'app-category-list',
@@ -21,8 +14,9 @@ export class CategoryListComponent implements OnInit {
   public pageSize = 10;
   public totalItems = 0;
   public totalPages = 1;
-  public sortField: keyof Category = 'name';
-  public sortDirection: 'asc' | 'desc' = 'asc';
+
+  // Remove 'keyof categories' because we'll send "-field" string
+  public sortField: string = '-updatedDate'; // default: latest updated first
 
   constructor(private categoryService: CategoryService) {}
 
@@ -44,12 +38,7 @@ export class CategoryListComponent implements OnInit {
 
   public loadCategories(): void {
     this.categoryService
-      .getCategories(
-        this.currentPage,
-        this.pageSize,
-        this.sortField,
-        this.sortDirection
-      )
+      .getCategories(this.currentPage, this.pageSize, this.sortField)
       .subscribe({
         next: ({ categories, totalItems }) => {
           this.categories = categories;
@@ -62,19 +51,17 @@ export class CategoryListComponent implements OnInit {
         },
       });
   }
-  public onPageChange(event: any): void {
-    this.pageSize = event.pageSize;
-    this.currentPage = event.pageIndex + 1; // MatPaginator is zero-based
-    this.loadCategories();
-  }
 
   public sort(field: keyof Category): void {
+    // Toggle logic using '-' prefix
     if (this.sortField === field) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      this.sortField = '-' + field;
+    } else if (this.sortField === '-' + field) {
+      this.sortField = field;
     } else {
       this.sortField = field;
-      this.sortDirection = 'asc';
     }
+
     this.resetAndReload();
   }
 
@@ -91,7 +78,7 @@ export class CategoryListComponent implements OnInit {
         this.resetAndReload();
       },
       error: (error) => {
-        // alert('Error deleting category: ' + error.message);
+        console.error('Error deleting Category:', error);
       },
     });
   }

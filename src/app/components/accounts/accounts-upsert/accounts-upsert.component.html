@@ -8,8 +8,9 @@
     <form [formGroup]="accountsForm" class="flex flex-col gap-4">
       <div class="flex flex-col gap-2">
         <label for="name" class="text-sky-900 font-semibold"
-          >Account Name</label
-        >
+          >Account Name <span class="required-asterisk">*</span>
+        </label>
+
         <input
           id="name"
           formControlName="name"
@@ -35,8 +36,8 @@
 
       <div class="flex flex-col gap-2">
         <label for="description" class="text-sky-900 font-semibold"
-          >Description</label
-        >
+          >Description <span class="required-asterisk">*</span>
+        </label>
         <textarea
           id="description"
           formControlName="description"
@@ -60,13 +61,69 @@
         </div>
       </div>
 
+      <div class="flex flex-col gap-2">
+        <label for="initialAmount" class="text-sky-900 font-semibold"
+          >Inital Amount <span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="initialAmount"
+          formControlName="initialAmount"
+          type="number"
+          (focus)="clearZero('initialAmount')"
+          placeholder="Enter The Inital Ammount"
+          class="w-full p-3 border border-sky-200 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sky-900"
+          [ngClass]="{
+            'border-red-500':
+              accountsForm.get('initialAmount')?.invalid &&
+              accountsForm.get('initialAmount')?.touched
+          }"
+        />
+        <div
+          *ngIf="
+            accountsForm.get('initialAmount')?.invalid &&
+            accountsForm.get('initialAmount')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Initial Amount is required
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2">
+        <label for="balance" class="text-sky-900 font-semibold"
+          >Balance<span class="required-asterisk">*</span>
+        </label>
+        <input
+          id="balance"
+          formControlName="balance"
+          type="number"
+          (focus)="clearZero('balance')"
+          placeholder="Enter Account Balance"
+          class="w-full p-3 border border-sky-200 rounded-md focus:outline-none focus:ring-2 focus:ring-sky-500 text-sky-900"
+          [ngClass]="{
+            'border-red-500':
+              accountsForm.get('balance')?.invalid &&
+              accountsForm.get('balance')?.touched
+          }"
+        />
+        <div
+          *ngIf="
+            accountsForm.get('balance')?.invalid &&
+            accountsForm.get('balance')?.touched
+          "
+          class="text-red-500 text-sm"
+        >
+          Balance is required
+        </div>
+      </div>
+
       <div class="flex justify-center gap-3">
         <button
           (click)="addAccounts()"
           [disabled]="accountsForm.pristine || accountsForm.invalid"
           class="bg-sky-600 text-white font-semibold py-2 px-4 rounded hover:bg-sky-700 disabled:bg-gray-400"
         >
-          {{ isEditing ? "Update" : "Add" }} Category
+          {{ isEditing ? "Update" : "Add" }} Account
         </button>
 
         <button

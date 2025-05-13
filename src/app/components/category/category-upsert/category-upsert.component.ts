@@ -3,15 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/enviroments/environment';
-
-// Define the Category interface
-interface Category {
-  id?: string;
-  name: string;
-  description: string;
-  createdDate?: string;
-  updatedDate?: string;
-}
+import { Category, CategoryForm } from '../entity/category-interface';
 
 @Component({
   selector: 'app-category-upsert',
@@ -19,21 +11,20 @@ interface Category {
   styleUrls: ['./category-upsert.component.css'],
 })
 export class CategoryUpsertComponent implements OnInit {
-  categoryForm: FormGroup;
+  categoryForm: FormGroup<CategoryForm> = new FormGroup<CategoryForm>({
+    name: new FormControl<string>('', Validators.required),
+    description: new FormControl<string>('', Validators.required),
+  });
+
   isEditing = false;
   categoryId: string | null = null;
-  private apiUrl = environment.apiUrlCat;
+  private apiUrl = environment.baseUrl + '/categories';
 
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
     private router: Router
-  ) {
-    this.categoryForm = new FormGroup({
-      name: new FormControl('', Validators.required),
-      description: new FormControl('', Validators.required),
-    });
-  }
+  ) {}
 
   public ngOnInit() {
     const idParam = this.route.snapshot.paramMap.get('id');

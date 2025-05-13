@@ -1,13 +1,6 @@
 {
   "categories": [
     {
-      "id": "0c19",
-      "name": "Travel",
-      "description": "Leaf Village",
-      "createdDate": "2025-04-30",
-      "updatedDate": "2025-04-30"
-    },
-    {
       "id": "d8bf",
       "name": "Jobs",
       "description": "Full time\n",
@@ -15,11 +8,10 @@
       "updatedDate": "2025-04-30"
     },
     {
-      "id": "3b9a",
       "name": "Internship",
-      "description": "Google",
-      "createdDate": "2025-04-30",
-      "updatedDate": "2025-04-30"
+      "description": "Google 0",
+      "updatedDate": "2025-05-03",
+      "id": "3b9a"
     },
     {
       "name": "Jobs",
@@ -37,12 +29,6 @@
       "updatedDate": "2025-04-30"
     },
     {
-      "name": "Bank",
-      "description": "State Bank India ",
-      "updatedDate": "2025-05-02",
-      "id": "d8bf"
-    },
-    {
       "id": "b618",
       "name": "Cheque",
       "description": "PNB",
@@ -57,25 +43,29 @@
       "updatedDate": "2025-04-30"
     },
     {
-      "id": "aa6e",
       "name": "CASH",
       "description": "travling",
-      "createdDate": "2025-05-01",
-      "updatedDate": "2025-05-01"
+      "initialAmount": 100000,
+      "balance": 0,
+      "updatedDate": "2025-05-12",
+      "id": "aa6e"
     },
     {
-      "id": "082b",
-      "name": "UPI",
-      "description": "Shopping",
-      "createdDate": "2025-05-01",
-      "updatedDate": "2025-05-01"
-    },
-    {
-      "id": "8858",
       "name": "Net Banking",
       "description": "Amazon Shopping",
-      "createdDate": "2025-05-02",
-      "updatedDate": "2025-05-02"
+      "initialAmount": 20000,
+      "balance": 0,
+      "updatedDate": "2025-05-12",
+      "id": "8858"
+    },
+    {
+      "id": "0628",
+      "name": "SBI",
+      "description": "State Bank",
+      "initialAmount": 121,
+      "balance": 2000,
+      "createdDate": "2025-05-12",
+      "updatedDate": "2025-05-12"
     }
   ]
 }

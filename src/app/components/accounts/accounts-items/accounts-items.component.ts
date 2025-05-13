@@ -1,9 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  Accounts,
-  AccountServiceService,
-} from 'src/app/services/account-service.service';
+import { AccountServiceService } from 'src/app/services/account-service.service';
 import { debounceTime } from 'rxjs/operators';
+import { Accounts } from '../entity/account-interface';
 
 @Component({
   selector: 'app-accounts-items',
@@ -16,8 +14,9 @@ export class AccountsItemsComponent implements OnInit {
   public pageSize = 10;
   public totalItems = 0;
   public totalPages = 1;
-  public sortField: keyof Accounts = 'name';
-  public sortDirection: 'asc' | 'desc' = 'asc';
+
+  // Remove 'keyof Accounts' because we'll send "-field" string
+  public sortField: string = '-updatedDate'; // default: latest updated first
 
   constructor(private accountsService: AccountServiceService) {}
 
@@ -39,12 +38,7 @@ export class AccountsItemsComponent implements OnInit {
 
   public loadAccounts(): void {
     this.accountsService
-      .getAccounts(
-        this.currentPage,
-        this.pageSize,
-        this.sortField,
-        this.sortDirection
-      )
+      .getAccounts(this.currentPage, this.pageSize, this.sortField)
       .subscribe({
         next: ({ accounts, totalItems }) => {
           this.accounts = accounts;
@@ -59,12 +53,15 @@ export class AccountsItemsComponent implements OnInit {
   }
 
   public sort(field: keyof Accounts): void {
+    // Toggle logic using '-' prefix
     if (this.sortField === field) {
-      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+      this.sortField = '-' + field;
+    } else if (this.sortField === '-' + field) {
+      this.sortField = field;
     } else {
       this.sortField = field;
-      this.sortDirection = 'asc';
     }
+
     this.resetAndReload();
   }
 
@@ -81,7 +78,7 @@ export class AccountsItemsComponent implements OnInit {
         this.resetAndReload();
       },
       error: (error) => {
-        // alert('Error deleting category: ' + error.message);
+        console.error('Error deleting account:', error);
       },
     });
   }

@@ -26,6 +26,10 @@ import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
 import { HomeComponent } from './pages/home/home.component';
+import { AddExpenseComponent } from './components/add-expense/add-expense.component';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { RecordsComponent } from './components/records/record-list/records.component';
+import { RecordUpsertComponent } from './components/records/record-upsert/record-upsert.component';
 
 @NgModule({
   declarations: [
@@ -33,11 +37,14 @@ import { HomeComponent } from './pages/home/home.component';
     LoginComponent,
     NavBarComponent,
     HomeComponent,
-
     CategoryListComponent,
     CategoryUpsertComponent,
     AccountsItemsComponent,
     AccountsUpsertComponent,
+    AddExpenseComponent,
+    SidebarComponent,
+    RecordsComponent,
+    RecordUpsertComponent,
   ],
   imports: [
     BrowserModule,
