@@ -20,6 +20,7 @@ const routes: Routes = [
   { path: 'app-home', component: HomeComponent },
   { path: 'records', component: RecordsComponent },
   { path: 'record-upsert', component: RecordUpsertComponent },
+  { path: 'record-upsert/:id', component: RecordUpsertComponent },
 ];
 
 @NgModule({

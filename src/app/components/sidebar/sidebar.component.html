@@ -1,36 +1,387 @@
-<div class="h-screen w-64 bg-white text-black flex flex-col p-4">
-  <nav class="flex flex-col space-y-4">
+<div
+  class="h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white flex flex-col shadow-xl transition-all duration-300 border-r border-gray-700"
+  [ngClass]="{ 'w-64': !isCollapsed, 'w-20': isCollapsed }"
+>
+  <!-- Header with improved styling -->
+  <div class="flex items-center justify-between p-4 border-b border-gray-700">
+    <div
+      class="flex items-center space-x-3"
+      [ngClass]="{ 'opacity-0 w-0': isCollapsed, 'opacity-100': !isCollapsed }"
+    >
+      <div class="bg-blue-500 p-2 rounded-lg shadow-lg">
+        <svg
+          class="w-7 h-7 text-white"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+          ></path>
+        </svg>
+      </div>
+      <div class="flex flex-col">
+        <span class="text-xl font-bold tracking-wide">FinanceTracker</span>
+        <span class="text-xs text-blue-300">Manage your money smarter</span>
+      </div>
+    </div>
+    <button
+      (click)="toggleSidebar()"
+      class="p-2 rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+      aria-label="Toggle sidebar"
+    >
+      <svg
+        class="w-6 h-6 text-blue-300"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          [attr.d]="
+            isCollapsed ? 'M4 6h16M4 12h16M4 18h16' : 'M6 18L18 6M6 6l12 12'
+          "
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Quick stats summary -->
+  <div
+    class="bg-gray-800 p-4 border-b border-gray-700 transition-all duration-300"
+    [ngClass]="{ hidden: isCollapsed }"
+  >
+    <div class="flex justify-between items-center mb-2">
+      <span class="text-xs uppercase text-gray-400">Balance</span>
+      <span class="text-green-400 font-semibold">$2,458.30</span>
+    </div>
+    <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+      <div class="bg-green-500 h-1.5 rounded-full" style="width: 65%"></div>
+    </div>
+  </div>
+
+  <!-- Navigation with enhanced styling -->
+  <nav
+    class="flex flex-col flex-1 p-3 space-y-1 overflow-y-auto custom-scrollbar"
+  >
+    <!-- Dashboard -->
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Dashboard"
+    >
+      <div class="relative">
+        <svg
+          class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+          ></path>
+        </svg>
+        <div
+          *ngIf="isCollapsed"
+          class="absolute -right-1 -top-1 w-2 h-2 bg-blue-500 rounded-full"
+        ></div>
+      </div>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Dashboard</span>
+        <span class="text-xs text-gray-400">Overview</span>
+      </div>
+    </a>
+
+    <!-- Categories -->
     <a
       routerLink="/category-list"
-      routerLinkActive="text-blue-400"
-      class="hover:text-blue-300"
-      >Categories</a
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Categories"
     >
+      <svg
+        class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"
+        ></path>
+      </svg>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Categories</span>
+        <span class="text-xs text-gray-400">Manage spending types</span>
+      </div>
+    </a>
+
+    <!-- Accounts -->
     <a
       routerLink="/accounts-items"
-      routerLinkActive="text-blue-400"
-      class="hover:text-blue-300"
-      >Accounts</a
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Accounts"
     >
+      <svg
+        class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
+        ></path>
+      </svg>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Accounts</span>
+        <span class="text-xs text-gray-400">Bank, cash, credit</span>
+      </div>
+    </a>
+
+    <!-- Transactions -->
     <a
       routerLink="/records"
-      routerLinkActive="text-blue-400"
-      class="hover:text-blue-300"
-      >Records</a
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Transactions"
     >
+      <svg
+        class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"
+        ></path>
+      </svg>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Transactions</span>
+        <span class="text-xs text-gray-400">History & details</span>
+      </div>
+    </a>
 
-    <!-- <a
-      routerLink="/add-expense"
-      routerLinkActive="text-blue-400"
-      class="hover:text-blue-300"
-      >Add Expense</a
-    > -->
+    <!-- Add Transaction -->
+    <a
+      routerLink="/record-upsert"
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Add Transaction"
+    >
+      <div class="relative">
+        <svg
+          class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+          ></path>
+        </svg>
+      </div>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Add Transaction</span>
+        <span class="text-xs text-gray-400">Record new entry</span>
+      </div>
+    </a>
 
+    <!-- Reports -->
+    <a
+      routerLink="/reports"
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Reports"
+    >
+      <svg
+        class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+        ></path>
+      </svg>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Reports</span>
+        <span class="text-xs text-gray-400">Analytics & charts</span>
+      </div>
+    </a>
+
+    <!-- Add divider before Profile -->
+    <div
+      class="my-2 border-t border-gray-700"
+      [ngClass]="{ 'mx-2': isCollapsed, 'mx-3': !isCollapsed }"
+    ></div>
+
+    <!-- Profile -->
     <a
       routerLink="/profile"
-      routerLinkActive="text-blue-400"
-      class="hover:text-blue-300"
-      >Profile</a
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Profile"
     >
+      <svg
+        class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        ></path>
+      </svg>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Profile</span>
+        <span class="text-xs text-gray-400">Settings & preferences</span>
+      </div>
+    </a>
+
+    <!-- Settings -->
+    <a
+      routerLink="/settings"
+      routerLinkActive="bg-blue-600 text-white"
+      [routerLinkActiveOptions]="{ exact: false }"
+      class="flex items-center space-x-3 p-3 rounded-lg hover:bg-blue-700/70 group transition-all duration-200"
+      [ngClass]="{ 'justify-center px-2': isCollapsed }"
+      aria-label="Settings"
+    >
+      <svg
+        class="w-6 h-6 group-hover:text-blue-300 transition-colors"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+        ></path>
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+        ></path>
+      </svg>
+      <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+        <span class="font-medium">Settings</span>
+        <span class="text-xs text-gray-400">App configuration</span>
+      </div>
+    </a>
   </nav>
+
+  <!-- User section at bottom -->
+  <div
+    class="p-4 border-t border-gray-700 flex items-center space-x-3"
+    [ngClass]="{ 'justify-center': isCollapsed }"
+  >
+    <div class="relative">
+      <img
+        class="w-10 h-10 rounded-full border-2 border-blue-500 object-cover"
+        src="data:image/jpeg;base64,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"
+        alt="User avatar"
+      />
+      <div
+        class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-gray-900"
+      ></div>
+    </div>
+    <div [ngClass]="{ hidden: isCollapsed }" class="flex flex-col">
+      <span class="font-medium text-sm">Sasuke Uchiha</span>
+      <span class="text-xs text-blue-300">Premium Plan</span>
+    </div>
+    <button
+      *ngIf="!isCollapsed"
+      class="ml-auto p-2 rounded-full hover:bg-gray-700 focus:outline-none"
+      aria-label="User menu"
+    >
+      <svg
+        class="w-5 h-5 text-gray-400"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M19 9l-7 7-7-7"
+        ></path>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Add custom scrollbar styles to style section -->
+  <style>
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: rgba(31, 41, 55, 0.5);
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(59, 130, 246, 0.5);
+      border-radius: 999px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(59, 130, 246, 0.8);
+    }
+  </style>
 </div>

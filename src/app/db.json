@@ -14,48 +14,20 @@
       "id": "3b9a"
     },
     {
-      "name": "Jobs",
-      "description": "intern",
-      "updatedDate": "2025-05-02",
-      "id": "819d"
+      "id": "e869",
+      "name": "Food",
+      "description": "Rice",
+      "createdDate": "2025-05-13",
+      "updatedDate": "2025-05-13"
     }
   ],
   "accounts": [
     {
-      "id": "0c19",
-      "name": "Cash",
-      "description": "Cash Money",
-      "createdDate": "2025-04-30",
-      "updatedDate": "2025-04-30"
-    },
-    {
-      "id": "b618",
-      "name": "Cheque",
-      "description": "PNB",
-      "createdDate": "2025-04-30",
-      "updatedDate": "2025-04-30"
-    },
-    {
-      "id": "3b9a",
-      "name": "Card",
-      "description": "Visa",
-      "createdDate": "2025-04-30",
-      "updatedDate": "2025-04-30"
-    },
-    {
-      "name": "CASH",
-      "description": "travling",
-      "initialAmount": 100000,
-      "balance": 0,
-      "updatedDate": "2025-05-12",
-      "id": "aa6e"
-    },
-    {
       "name": "Net Banking",
       "description": "Amazon Shopping",
       "initialAmount": 20000,
-      "balance": 0,
-      "updatedDate": "2025-05-12",
+      "balance": -6981,
+      "updatedDate": "2025-05-14",
       "id": "8858"
     },
     {
@@ -63,9 +35,79 @@
       "name": "SBI",
       "description": "State Bank",
       "initialAmount": 121,
-      "balance": 2000,
+      "balance": 4200,
       "createdDate": "2025-05-12",
       "updatedDate": "2025-05-12"
+    },
+    {
+      "id": "145c",
+      "name": "test",
+      "description": "343",
+      "initialAmount": 1122,
+      "balance": 111089,
+      "createdDate": "2025-05-14",
+      "updatedDate": "2025-05-14",
+      "isDeleted": true
+    },
+    {
+      "id": "b184",
+      "name": "Cash ",
+      "description": "500 Cash",
+      "initialAmount": 100,
+      "balance": 678,
+      "createdDate": "2025-05-14",
+      "updatedDate": "2025-05-14"
+    }
+  ],
+  "records": [
+    {
+      "id": "9a1c",
+      "type": "expense",
+      "fromAccountId": "0628",
+      "toAccountId": null,
+      "categoryId": "e869",
+      "description": "goo",
+      "amount": 123,
+      "date": "2025-05-14"
+    },
+    {
+      "id": "4557",
+      "type": "expense",
+      "fromAccountId": "0628",
+      "toAccountId": null,
+      "categoryId": "e869",
+      "description": "chapati",
+      "amount": 111,
+      "date": "2025-05-15"
+    },
+    {
+      "id": "6e3e",
+      "type": "transfer",
+      "fromAccountId": "b184",
+      "toAccountId": "0628",
+      "categoryId": null,
+      "description": "yoyo",
+      "amount": 100,
+      "date": "2025-05-15"
+    },
+    {
+      "id": "f2ec",
+      "type": "transfer",
+      "fromAccountId": "b184",
+      "toAccountId": "0628",
+      "categoryId": null,
+      "description": "100 transfer",
+      "amount": 100,
+      "date": "2025-05-19T06:56:24.077Z"
+    },
+    {
+      "id": "f912",
+      "type": "expense",
+      "fromAccountId": "b184",
+      "categoryId": "e869",
+      "description": "chapati",
+      "amount": 122,
+      "date": "2025-05-20"
     }
   ]
 }

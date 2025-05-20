@@ -30,6 +30,10 @@ import { AddExpenseComponent } from './components/add-expense/add-expense.compon
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { RecordsComponent } from './components/records/record-list/records.component';
 import { RecordUpsertComponent } from './components/records/record-upsert/record-upsert.component';
+import { AccountServiceService } from './services/account-service.service';
+import { CategoryService } from './services/category-service.service';
+import { RecordService } from './services/record.service';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 @NgModule({
   declarations: [
@@ -53,6 +57,14 @@ import { RecordUpsertComponent } from './components/records/record-upsert/record
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
+    // RouterModule.forRoot([
+    //   { path: 'record-upsert', component: RecordUpsertComponent },
+    //   { path: 'records', component: RecordsComponent },
+    //   { path: 'category-list', component: RecordsComponent }, // Replace with actual component
+    //   { path: 'accounts-items', component: RecordsComponent }, // Replace with actual component
+    //   { path: 'profile', component: RecordsComponent }, // Replace with actual component
+    //   { path: '', redirectTo: '/records', pathMatch: 'full' },
+    // ]),
     // Material modules
     MatFormFieldModule,
     MatInputModule,
@@ -62,8 +74,9 @@ import { RecordUpsertComponent } from './components/records/record-upsert/record
     MatPaginatorModule,
     MatSortModule,
     MatCardModule,
+    BrowserAnimationsModule,
   ],
-  providers: [],
+  providers: [AccountServiceService, CategoryService, RecordService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

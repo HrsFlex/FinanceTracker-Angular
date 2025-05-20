@@ -1,0 +1,26 @@
+export class RecordUpsertComponent implements OnInit {
+  recordForm: FormGroup<RecordForm>;
+  accounts: Accounts[] = [];
+  categories: Category[] = [];
+  transactionTypes = ['income', 'expense', 'transfer'];
+
+  constructor(
+    private accountService: AccountServiceService,
+    private categoryService: CategoryService,
+    private recordService: RecordService
+  ) {
+    this.recordForm = new FormGroup<RecordForm>({
+      type: new FormControl<string>('expense', Validators.required),
+      fromAccountId: new FormControl<string | null>(null, Validators.required),
+      toAccountId: new FormControl<string | null>(null),
+      categoryId: new FormControl<string | null>(null, Validators.required),
+      description: new FormControl<string>(''),
+      amount: new FormControl<number | null>(null, [
+        Validators.required,
+        Validators.min(0.01)
+      ]),
+      date: new FormControl<string>(
+        new Date().toISOString().split('T')[0],
+        Validators.required
+      ),
+    });

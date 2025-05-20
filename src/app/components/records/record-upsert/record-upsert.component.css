@@ -34,3 +34,9 @@ label {
     background-color: #6c757d;
     cursor: not-allowed;
 }
+
+.required-asterisk {
+    color: red;
+    font-size: 0.9rem;
+    margin-left: 2px;
+}

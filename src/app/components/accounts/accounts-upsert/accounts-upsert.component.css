@@ -64,7 +64,5 @@ hover\:bg-gray-600:hover {
 .required-asterisk {
   color: red;
   font-size: 0.9rem;
-  /* vertical-align: super; */
-
   margin-left: 2px;
 }

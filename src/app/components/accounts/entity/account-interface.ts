@@ -5,9 +5,10 @@ export interface Accounts {
   name: string;
   description: string;
   initialAmount: number;
-  balance: number;
+  balance: number; //its is matching
   createdDate: string;
   updatedDate: string;
+  isDeleted?: boolean;
 }
 
 export interface AccountsForm {

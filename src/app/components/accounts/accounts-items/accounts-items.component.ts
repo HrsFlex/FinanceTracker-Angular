@@ -71,15 +71,29 @@ export class AccountsItemsComponent implements OnInit {
     this.loadAccounts();
   }
 
-  public removeAccounts(id: any): void {
-    this.accountsService.deleteAccounts(id).subscribe({
-      next: () => {
-        this.accountsService.notifyAccountsChanged();
-        this.resetAndReload();
-      },
-      error: (error) => {
-        console.error('Error deleting account:', error);
-      },
-    });
+  // public removeAccounts(id: any): void {
+  //   this.accountsService.deleteAccounts(id).subscribe({
+  //     next: () => {
+  //       this.accountsService.notifyAccountsChanged();
+  //       this.resetAndReload();
+  //     },
+  //     error: (error) => {
+  //       console.error('Error deleting account:', error);
+  //     },
+  //   });
+  // }
+  deleteAccount(id: any): void {
+    if (
+      confirm(
+        'Are you sure you want to delete this account? It will be removed from the list but remain in transactions.'
+      )
+    ) {
+      this.accountsService.deleteAccount(id).subscribe({
+        next: () => {
+          this.accounts = this.accounts.filter((account) => account.id !== id);
+        },
+        error: (err) => alert('Error: ' + err.message),
+      });
+    }
   }
 }

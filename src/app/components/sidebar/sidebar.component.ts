@@ -6,9 +6,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent {
-  isMobileMenuOpen = false;
+  isCollapsed = false;
 
-  toggleMobileMenu() {
-    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  toggleSidebar() {
+    this.isCollapsed = !this.isCollapsed;
   }
 }

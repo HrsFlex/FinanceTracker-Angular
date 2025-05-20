@@ -52,6 +52,21 @@
 
           <th
             class="p-3 border-b border-sky-300 cursor-pointer"
+            (click)="sort('balance')"
+          >
+            Account Balance
+            <span class="ml-1">
+              <ng-container *ngIf="sortField === 'balance'">▲</ng-container>
+              <ng-container *ngIf="sortField === '-balance'">▼</ng-container>
+              <ng-container
+                *ngIf="sortField !== 'balance' && sortField !== '-balance'"
+                >⇅</ng-container
+              >
+            </span>
+          </th>
+
+          <th
+            class="p-3 border-b border-sky-300 cursor-pointer"
             (click)="sort('createdDate')"
           >
             Created Date
@@ -104,6 +119,9 @@
           <td class="p-3 border-t border-sky-200">
             {{ account.description || "N/A" }}
           </td>
+          <td class="p-3 border-t border-sky-200 font-bold text-green-500">
+            {{ account.balance || "N/A" }}
+          </td>
           <td class="p-3 border-t border-sky-200">
             {{ account.createdDate || account.updatedDate }}
           </td>
@@ -117,7 +135,7 @@
               >Edit</a
             >
             <button
-              (click)="removeAccounts(account.id)"
+              (click)="deleteAccount(account.id)"
               class="inline-block bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition"
             >
               Delete
