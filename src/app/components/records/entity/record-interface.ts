@@ -36,3 +36,16 @@ export interface CategoryOption {
   value: string; // 'all', 'transfer', or category.id
   label: string; // 'All', 'Transfer', or category.name
 }
+
+export interface DisplayRecord {
+  id?: string;
+  type: string;
+  fromAccount: string;
+  toAccount?: string;
+  categoryId?: number;
+  category?: string;
+  description: string;
+  amount: number;
+  date: string; // Formatted date and time, e.g., "May 19, 2025, 12:12 PM"
+  sortDate: string;
+}

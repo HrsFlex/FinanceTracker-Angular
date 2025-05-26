@@ -4,6 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/enviroments/environment';
 import { Accounts, AccountsForm } from '../entity/account-interface';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-accounts-upsert',
@@ -19,7 +20,8 @@ export class AccountsUpsertComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private dialogService: DialogService
   ) {
     this.accountsForm = new FormGroup<AccountsForm>({
       name: new FormControl<string>('', Validators.required),
@@ -72,12 +74,13 @@ export class AccountsUpsertComponent implements OnInit {
 
     request.subscribe(
       () => this.router.navigate(['/accounts-items']),
-      (error) =>
-        alert(
-          `Error ${this.isEditing ? 'updating' : 'adding'} accounts: ${
-            error.message
-          }`
-        )
+      (error) => {
+        const action = this.isEditing ? 'updating' : 'adding';
+        this.dialogService.alert(
+          'Error',
+          `Error ${action} accounts: ${error.message}`
+        );
+      }
     );
   }
 

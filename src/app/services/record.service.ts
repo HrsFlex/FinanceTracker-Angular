@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, forkJoin, throwError, of } from 'rxjs';
+import { Observable, forkJoin, throwError, of, Subject } from 'rxjs';
 import { switchMap, catchError } from 'rxjs/operators';
 import { environment } from 'src/enviroments/environment';
 import {
@@ -14,6 +14,8 @@ import {
 export class RecordService {
   private apiUrl = environment.baseUrl + '/records';
   private accountsUrl = environment.baseUrl + '/accounts';
+  private recordUpdated = new Subject<void>();
+  recordUpdated$ = this.recordUpdated.asObservable();
 
   constructor(private http: HttpClient) {}
 
@@ -23,7 +25,8 @@ export class RecordService {
   ): Observable<Record[]> {
     let params = new HttpParams();
     if (sortField) {
-      const sortValue = sortOrder === 'desc' ? `-${sortField}` : sortField;
+      const sortValue =
+        sortOrder === 'desc' ? `-${sortField},-id` : `${sortField},id`;
       params = params.set('_sort', sortValue);
     }
     return this.http.get<Record[]>(this.apiUrl, { params });
@@ -54,11 +57,73 @@ export class RecordService {
     if (!record.id) {
       return throwError(() => new Error('Record ID is required for update'));
     }
-    return this.validateAndUpdateBalances(record).pipe(
-      switchMap(() =>
-        this.http.patch<Record>(`${this.apiUrl}/${record.id}`, record)
+    return this.getRecordById(record.id).pipe(
+      switchMap((originalRecord) =>
+        forkJoin({
+          fromAccount: this.http.get<Accounts>(
+            `${this.accountsUrl}/${String(originalRecord.fromAccountId)}`
+          ),
+          toAccount:
+            originalRecord.type === 'transfer' && originalRecord.toAccountId
+              ? this.http.get<Accounts>(
+                  `${this.accountsUrl}/${String(originalRecord.toAccountId)}`
+                )
+              : of(null),
+        }).pipe(
+          switchMap(({ fromAccount, toAccount }) => {
+            const updates: Observable<any>[] = [];
+
+            // Revert original transaction
+            let fromBalanceUpdate: number;
+            if (originalRecord.type === 'income') {
+              fromBalanceUpdate = fromAccount.balance - originalRecord.amount;
+            } else {
+              // Expense or transfer: add amount back to fromAccount
+              fromBalanceUpdate = fromAccount.balance + originalRecord.amount;
+            }
+
+            updates.push(
+              this.http.patch(
+                `${this.accountsUrl}/${String(originalRecord.fromAccountId)}`,
+                {
+                  balance: fromBalanceUpdate,
+                }
+              )
+            );
+
+            if (
+              originalRecord.type === 'transfer' &&
+              toAccount &&
+              originalRecord.toAccountId
+            ) {
+              const toBalanceUpdate = toAccount.balance - originalRecord.amount;
+              updates.push(
+                this.http.patch(
+                  `${this.accountsUrl}/${String(originalRecord.toAccountId)}`,
+                  {
+                    balance: toBalanceUpdate,
+                  }
+                )
+              );
+            }
+
+            return forkJoin(updates);
+          })
+        )
       ),
-      catchError((err) => throwError(() => new Error(err.message)))
+      // After reverting, apply new transaction
+      switchMap(() => this.validateAndUpdateBalances(record)),
+      switchMap(() => {
+        console.log('PATCH request to update record:', record); // Debug
+        return this.http.patch<Record>(`${this.apiUrl}/${record.id}`, record);
+      }),
+      switchMap((updatedRecord) => {
+        this.recordUpdated.next(); // Notify record change
+        return of(updatedRecord);
+      }),
+      catchError((err) =>
+        throwError(() => new Error('Failed to update record: ' + err.message))
+      )
     );
   }
 
@@ -80,24 +145,12 @@ export class RecordService {
           switchMap(({ fromAccount, toAccount }) => {
             const updates: Observable<any>[] = [];
 
-            // Revert balances based on transaction type
             let fromBalanceUpdate: number;
             if (type === 'income') {
-              // Reverse income: subtract amount from fromAccount
               fromBalanceUpdate = fromAccount.balance - amount;
             } else {
-              // Reverse expense or transfer: add amount back to fromAccount
               fromBalanceUpdate = fromAccount.balance + amount;
             }
-
-            // if (fromBalanceUpdate < 0) {
-            //   return throwError(
-            //     () =>
-            //       new Error(
-            //         'Reverting transaction would result in negative balance for from account'
-            //       )
-            //   );
-            // }
 
             updates.push(
               this.http.patch(`${this.accountsUrl}/${String(fromAccountId)}`, {
@@ -106,16 +159,7 @@ export class RecordService {
             );
 
             if (type === 'transfer' && toAccount && toAccountId) {
-              // Reverse transfer: subtract amount from toAccount
               const toBalanceUpdate = toAccount.balance - amount;
-              // if (toBalanceUpdate < 0) {
-              //   return throwError(
-              //     () =>
-              //       new Error(
-              //         'Reverting transaction would result in negative balance for to account'
-              //       )
-              //   );
-              // }
               updates.push(
                 this.http.patch(`${this.accountsUrl}/${String(toAccountId)}`, {
                   balance: toBalanceUpdate,

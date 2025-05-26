@@ -18,7 +18,10 @@ export class CategoryListComponent implements OnInit {
   // Remove 'keyof categories' because we'll send "-field" string
   public sortField: string = '-updatedDate'; // default: latest updated first
 
-  constructor(private categoryService: CategoryService) {}
+  constructor(
+    private categoryService: CategoryService
+  ) // private dialogService DialogService
+  {}
 
   public ngOnInit(): void {
     this.loadCategories();

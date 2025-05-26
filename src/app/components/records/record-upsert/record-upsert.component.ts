@@ -9,7 +9,9 @@ import {
   Record,
   RecordForm,
 } from '../entity/record-interface';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
+import { DialogService } from 'src/app/services/dialog.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-record-upsert',
@@ -21,12 +23,18 @@ export class RecordUpsertComponent implements OnInit {
   accounts: Accounts[] = [];
   categories: Category[] = [];
   transactionTypes = ['income', 'expense', 'transfer'];
+  recordId: string | null = null;
+  isEditing: boolean = false;
+  isSubmitting: boolean = false; // Add loading state
 
   constructor(
     private accountService: AccountServiceService,
     private categoryService: CategoryService,
     private recordService: RecordService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private router: Router,
+    private dialogService: DialogService,
+    private snackBar: MatSnackBar
   ) {
     this.recordForm = new FormGroup<RecordForm>({
       type: new FormControl<'income' | 'expense' | 'transfer'>('expense', {
@@ -52,13 +60,17 @@ export class RecordUpsertComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.recordId = this.route.snapshot.paramMap.get('id');
+    console.log('Record ID from route:', this.recordId); // Debug: Verify ID
+    if (this.recordId) {
+      this.isEditing = true;
+      this.loadRecordForEdit(this.recordId);
+    } else {
+      console.log('Creating new record');
+    }
     this.loadAccounts();
     this.loadCategories();
     this.setupTypeWatcher();
-    const recordId = this.route.snapshot.paramMap.get('id');
-    if (recordId) {
-      this.loadRecordForEdit(recordId);
-    }
   }
 
   public loadAccounts() {
@@ -73,6 +85,14 @@ export class RecordUpsertComponent implements OnInit {
       next: (data) => (this.categories = data.categories || []),
       error: (err) => console.error('Failed to load categories', err),
     });
+  }
+  public onDateChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.value) {
+      // Convert datetime-local value (YYYY-MM-DDTHH:mm) to ISO string
+      const isoDate = `${input.value}:00Z`; // Append seconds and UTC
+      this.recordForm.get('date')?.setValue(isoDate);
+    }
   }
 
   public setupTypeWatcher() {
@@ -94,9 +114,13 @@ export class RecordUpsertComponent implements OnInit {
   }
 
   private loadRecordForEdit(id: string): void {
+    //Solverd the date time issue.
     this.recordService.getRecordById(id.toString()).subscribe({
-      // id ko number se string kiya hai
       next: (record) => {
+        console.log('Loaded record:', record); // Debug: Verify record data
+        const dateValue = record.date.includes('T')
+          ? record.date
+          : `${record.date}T00:00:00Z`; // Add default time if missing
         this.recordForm.get('type')?.setValue(record.type);
         this.recordForm.get('fromAccountId')?.setValue(record.fromAccountId);
         this.recordForm
@@ -105,23 +129,25 @@ export class RecordUpsertComponent implements OnInit {
         this.recordForm.get('categoryId')?.setValue(record.categoryId ?? null);
         this.recordForm.get('description')?.setValue(record.description);
         this.recordForm.get('amount')?.setValue(record.amount);
-        this.recordForm.get('date')?.setValue(record.date);
+        this.recordForm.get('date')?.setValue(dateValue);
       },
       error: (err) => {
         console.error('Failed to load record', err);
+        this.dialogService.alert(
+          'Error',
+          'Failed to load record: ' + err.message
+        );
+        this.router.navigate(['/records']);
       },
     });
   }
-
   public submitForm() {
     if (this.recordForm.invalid) {
       this.recordForm.markAllAsTouched();
       return;
     }
-
+    this.isSubmitting = true; // Disable submission
     const formValue = this.recordForm.getRawValue();
-
-    // Narrow the type manually and safely
     const type = formValue.type as 'income' | 'expense' | 'transfer';
 
     // Validate required fields based on type
@@ -131,11 +157,15 @@ export class RecordUpsertComponent implements OnInit {
       (type !== 'transfer' && formValue.categoryId === null) ||
       (type === 'transfer' && formValue.toAccountId === null)
     ) {
-      alert('Form contains invalid or incomplete data.');
+      this.dialogService.alert(
+        'Validation Error',
+        'Form contains invalid or incomplete data.'
+      );
       return;
     }
 
     const record: Record = {
+      id: this.recordId || undefined,
       type,
       fromAccountId: formValue.fromAccountId,
       toAccountId: type === 'transfer' ? formValue.toAccountId! : undefined,
@@ -144,28 +174,42 @@ export class RecordUpsertComponent implements OnInit {
       amount: formValue.amount,
       date: formValue.date,
     };
+    console.log('Submitting record:', record);
 
-    this.recordService.createRecord(record).subscribe({
+    const request =
+      this.isEditing && this.recordId
+        ? this.recordService.updateRecord(record)
+        : this.recordService.createRecord(record);
+
+    request.subscribe({
       next: () => {
-        alert('Record saved successfully!');
-        this.resetForm();
+        this.isSubmitting = false; // Re-enable after success
+        this.dialogService
+          .confirm(
+            'Success',
+            `Are you sure to ${this.isEditing ? 'update' : 'save'} the data?`
+          )
+          .then((confirmed) => {
+            if (confirmed) {
+              this.router.navigate(['/records']);
+              this.snackBar.open('Record deleted successfully!', 'Close', {
+                duration: 3000,
+              });
+            }
+          });
       },
       error: (err) => {
-        console.error('Failed to save record', err);
-        alert(`Failed to save record: ${err.message}`);
+        this.dialogService.alert(
+          'Error',
+          `Failed to ${this.isEditing ? 'update' : 'save'} record: ${
+            err.message
+          }`
+        );
       },
     });
   }
 
-  private resetForm() {
-    this.recordForm.reset({
-      type: 'income',
-      fromAccountId: null,
-      toAccountId: null,
-      categoryId: null,
-      description: '',
-      amount: null,
-      date: new Date().toISOString(),
-    });
+  public cancelEdit() {
+    this.router.navigate(['/records']);
   }
 }

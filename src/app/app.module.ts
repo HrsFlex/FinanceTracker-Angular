@@ -34,6 +34,10 @@ import { AccountServiceService } from './services/account-service.service';
 import { CategoryService } from './services/category-service.service';
 import { RecordService } from './services/record.service';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dialog.component';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { AlertDialogComponent } from './components/alert-dialog/alert-dialog.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   declarations: [
@@ -49,6 +53,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     SidebarComponent,
     RecordsComponent,
     RecordUpsertComponent,
+    ConfirmDialogComponent,
+    AlertDialogComponent,
   ],
   imports: [
     BrowserModule,
@@ -57,6 +63,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     FormsModule,
     HttpClientModule,
     ReactiveFormsModule,
+    MatSnackBarModule,
+
     // RouterModule.forRoot([
     //   { path: 'record-upsert', component: RecordUpsertComponent },
     //   { path: 'records', component: RecordsComponent },
@@ -66,6 +74,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     //   { path: '', redirectTo: '/records', pathMatch: 'full' },
     // ]),
     // Material modules
+    MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,

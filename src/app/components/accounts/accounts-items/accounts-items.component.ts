@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { AccountServiceService } from 'src/app/services/account-service.service';
 import { debounceTime } from 'rxjs/operators';
 import { Accounts } from '../entity/account-interface';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-accounts-items',
@@ -18,7 +19,10 @@ export class AccountsItemsComponent implements OnInit {
   // Remove 'keyof Accounts' because we'll send "-field" string
   public sortField: string = '-updatedDate'; // default: latest updated first
 
-  constructor(private accountsService: AccountServiceService) {}
+  constructor(
+    private accountsService: AccountServiceService,
+    private dialogService: DialogService
+  ) {}
 
   public ngOnInit(): void {
     this.loadAccounts();
@@ -83,17 +87,25 @@ export class AccountsItemsComponent implements OnInit {
   //   });
   // }
   deleteAccount(id: any): void {
-    if (
-      confirm(
+    this.dialogService
+      .confirm(
+        'Delete Account?',
         'Are you sure you want to delete this account? It will be removed from the list but remain in transactions.'
       )
-    ) {
-      this.accountsService.deleteAccount(id).subscribe({
-        next: () => {
-          this.accounts = this.accounts.filter((account) => account.id !== id);
-        },
-        error: (err) => alert('Error: ' + err.message),
+      .then((confirmed) => {
+        if (!confirmed) return;
+
+        this.accountsService.deleteAccount(id).subscribe({
+          next: () => {
+            this.accounts = this.accounts.filter(
+              (account) => account.id !== id
+            );
+            this.dialogService.toast('Account deleted successfully.');
+          },
+          error: (err) => {
+            alert('Error deleting account: ' + err.message);
+          },
+        });
       });
-    }
   }
 }

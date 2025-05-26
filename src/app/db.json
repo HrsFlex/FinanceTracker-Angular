@@ -3,14 +3,14 @@
     {
       "id": "d8bf",
       "name": "Jobs",
-      "description": "Full time\n",
+      "description": "Full time",
       "createdDate": "2025-04-30",
       "updatedDate": "2025-04-30"
     },
     {
       "name": "Internship",
-      "description": "Google 0",
-      "updatedDate": "2025-05-03",
+      "description": "Google",
+      "updatedDate": "2025-05-26",
       "id": "3b9a"
     },
     {
@@ -35,7 +35,7 @@
       "name": "SBI",
       "description": "State Bank",
       "initialAmount": 121,
-      "balance": 4200,
+      "balance": 2533,
       "createdDate": "2025-05-12",
       "updatedDate": "2025-05-12"
     },
@@ -54,60 +54,38 @@
       "name": "Cash ",
       "description": "500 Cash",
       "initialAmount": 100,
-      "balance": 678,
+      "balance": 2412,
       "createdDate": "2025-05-14",
       "updatedDate": "2025-05-14"
     }
   ],
   "records": [
     {
-      "id": "9a1c",
+      "id": "94e9",
       "type": "expense",
       "fromAccountId": "0628",
-      "toAccountId": null,
       "categoryId": "e869",
-      "description": "goo",
-      "amount": 123,
-      "date": "2025-05-14"
+      "description": "Shopping",
+      "amount": 700,
+      "date": "2025-05-26T00:00:00Z"
     },
     {
-      "id": "4557",
+      "id": "a47c",
       "type": "expense",
       "fromAccountId": "0628",
-      "toAccountId": null,
       "categoryId": "e869",
-      "description": "chapati",
-      "amount": 111,
-      "date": "2025-05-15"
+      "description": "Shopping",
+      "amount": 1001,
+      "date": "2025-05-26T00:00:00Z"
     },
     {
-      "id": "6e3e",
-      "type": "transfer",
-      "fromAccountId": "b184",
-      "toAccountId": "0628",
-      "categoryId": null,
-      "description": "yoyo",
-      "amount": 100,
-      "date": "2025-05-15"
-    },
-    {
-      "id": "f2ec",
-      "type": "transfer",
-      "fromAccountId": "b184",
-      "toAccountId": "0628",
-      "categoryId": null,
-      "description": "100 transfer",
-      "amount": 100,
-      "date": "2025-05-19T06:56:24.077Z"
-    },
-    {
-      "id": "f912",
-      "type": "expense",
+      "id": "3c5c",
+      "type": "income",
       "fromAccountId": "b184",
       "categoryId": "e869",
-      "description": "chapati",
-      "amount": 122,
-      "date": "2025-05-20"
+      "description": "income",
+      "amount": 200,
+      "date": "2025-05-26T10:13:23.276Z"
     }
   ]
 }

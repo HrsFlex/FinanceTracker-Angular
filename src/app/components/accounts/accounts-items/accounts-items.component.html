@@ -119,8 +119,14 @@
           <td class="p-3 border-t border-sky-200">
             {{ account.description || "N/A" }}
           </td>
-          <td class="p-3 border-t border-sky-200 font-bold text-green-500">
-            {{ account.balance || "N/A" }}
+          <td
+            class="p-3 border-t border-sky-200 font-bold"
+            [ngClass]="{
+              'text-green-500': account.balance >= 0,
+              'text-red-500': account.balance < 0
+            }"
+          >
+            {{ account.balance }}
           </td>
           <td class="p-3 border-t border-sky-200">
             {{ account.createdDate || account.updatedDate }}

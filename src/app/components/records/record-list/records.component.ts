@@ -4,24 +4,15 @@ import {
   Accounts,
   Category,
   CategoryOption,
+  DisplayRecord,
   Record,
 } from '../entity/record-interface';
 import { RecordService } from 'src/app/services/record.service';
 import { AccountServiceService } from 'src/app/services/account-service.service';
 import { CategoryService } from 'src/app/services/category-service.service';
 import { Router } from '@angular/router';
-
-interface DisplayRecord {
-  id?: string;
-  type: string;
-  fromAccount: string;
-  toAccount?: string;
-  categoryId?: number;
-  category?: string;
-  description: string;
-  amount: number;
-  date: string; // Formatted date and time, e.g., "May 19, 2025, 12:12 PM"
-}
+import { DialogService } from 'src/app/services/dialog.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-records',
@@ -47,7 +38,9 @@ export class RecordsComponent implements OnInit {
     private recordService: RecordService,
     private accountService: AccountServiceService,
     private categoryService: CategoryService,
-    private router: Router
+    private router: Router,
+    private dialogService: DialogService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -61,7 +54,9 @@ export class RecordsComponent implements OnInit {
       this.recordService.getRecords(this.sortField, this.sortOrder),
     ]).subscribe({
       next: ([accounts, categoriesData, records]) => {
-        this.accounts = accounts || [];
+        this.accounts = (accounts || []).filter(
+          (account) => !account.isDeleted
+        );
         this.categories = categoriesData.categories || [];
 
         // Update category options
@@ -91,7 +86,11 @@ export class RecordsComponent implements OnInit {
         // Map to DisplayRecord
         this.displayRecords = filteredRecords.map((record) => {
           let formattedDate = 'Invalid Date';
+          let sortDate = record.date;
           if (record.date) {
+            sortDate = record.date.includes('T')
+              ? record.date
+              : `${record.date}T00:00:00Z`;
             const date = new Date(record.date);
             if (!isNaN(date.getTime())) {
               formattedDate = date.toLocaleString('en-US', {
@@ -111,10 +110,10 @@ export class RecordsComponent implements OnInit {
             type: record.type,
             fromAccount:
               this.accounts.find((a) => a.id === String(record.fromAccountId))
-                ?.name || 'Unknown',
+                ?.name || 'Deleted Account',
             toAccount: record.toAccountId
               ? this.accounts.find((a) => a.id === String(record.toAccountId))
-                  ?.name || 'Unknown'
+                  ?.name || 'Deleted Account'
               : undefined,
             categoryId: Number(record.categoryId),
             category:
@@ -126,23 +125,27 @@ export class RecordsComponent implements OnInit {
             description: record.description || 'No description',
             amount: record.amount,
             date: formattedDate,
+            sortDate,
           };
         });
-
-        // Filter by selected category
-        if (this.selectedCategory !== 'all') {
-          this.displayRecords = this.displayRecords.filter((record) => {
-            if (this.selectedCategory === 'transfer') {
-              return record.type === 'transfer';
-            }
-            return (
-              record.type !== 'transfer' &&
-              String(record.categoryId) === String(this.selectedCategory)
-            );
-          });
-        }
+        this.displayRecords.sort((a, b) => {
+          const dateA = new Date(a.date).getTime();
+          const dateB = new Date(b.date).getTime();
+          if (dateA === dateB) {
+            // Secondary sort by id
+            return this.sortOrder === 'desc'
+              ? (b.id || '').localeCompare(a.id || '')
+              : (a.id || '').localeCompare(b.id || '');
+          }
+          return this.sortOrder === 'desc' ? dateB - dateA : dateA - dateB;
+        });
       },
-      error: (err) => console.error('Failed to load records', err),
+      error: (err) => {
+        console.error('Failed to load records', err);
+        this.snackBar.open('Failed to load records: ' + err.message, 'Close', {
+          duration: 5000,
+        });
+      },
     });
   }
   onCategoryChange() {
@@ -161,25 +164,35 @@ export class RecordsComponent implements OnInit {
 
   editRecord(id?: string) {
     if (id) {
+      console.log('Navigating to edit record:', id); // Debug
       this.router.navigate(['/record-upsert', id]);
     }
   }
 
-  deleteRecord(id?: string) {
-    if (
-      id &&
-      confirm(
-        'Are you sure you want to delete this record? This will revert the account balances.'
-      )
-    ) {
-      this.recordService.deleteRecord(id.toString()).subscribe({
-        next: () => {
-          this.displayRecords = this.displayRecords.filter(
-            (record) => record.id !== id
-          );
-        },
-        error: (err) => alert('Error deleting record: ' + err.message),
-      });
-    }
+  async deleteRecord(id?: string) {
+    if (!id) return;
+
+    const confirmed = await this.dialogService.confirm(
+      'Delete Record?',
+      'Are you sure you want to delete this record? This will revert the account balances.'
+    );
+
+    if (!confirmed) return;
+
+    this.recordService.deleteRecord(id.toString()).subscribe({
+      next: () => {
+        this.displayRecords = this.displayRecords.filter(
+          (record) => record.id !== id
+        );
+        this.snackBar.open('Record deleted successfully!', 'Close', {
+          duration: 3000,
+        });
+      },
+      error: (err) => {
+        this.snackBar.open('Error deleting record: ' + err.message, 'Close', {
+          duration: 5000,
+        });
+      },
+    });
   }
 }

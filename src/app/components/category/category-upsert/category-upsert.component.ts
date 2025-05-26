@@ -4,6 +4,8 @@ import { HttpClient } from '@angular/common/http';
 import { ActivatedRoute, Router } from '@angular/router';
 import { environment } from 'src/enviroments/environment';
 import { Category, CategoryForm } from '../entity/category-interface';
+import { DialogService } from 'src/app/services/dialog.service';
+// import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-category-upsert',
@@ -23,7 +25,8 @@ export class CategoryUpsertComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private route: ActivatedRoute,
-    private router: Router
+    private router: Router,
+    private dialogService: DialogService
   ) {}
 
   public ngOnInit() {
@@ -58,14 +61,15 @@ export class CategoryUpsertComponent implements OnInit {
     };
 
     const request =
-      this.isEditing && this.categoryId
+      this.isEditing && this.categoryId //doing editing
         ? this.http.put(`${this.apiUrl}/${this.categoryId}`, categoryData)
         : this.http.post(this.apiUrl, categoryData);
 
     request.subscribe(
       () => this.router.navigate(['/category-list']),
       (error) =>
-        alert(
+        this.dialogService.alert(
+          'Error',
           `Error ${this.isEditing ? 'updating' : 'adding'} category: ${
             error.message
           }`
