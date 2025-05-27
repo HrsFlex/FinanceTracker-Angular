@@ -1,24 +1,60 @@
 {
   "categories": [
     {
-      "id": "d8bf",
-      "name": "Jobs",
-      "description": "Full time",
-      "createdDate": "2025-04-30",
-      "updatedDate": "2025-04-30"
+      "id": "9fb5",
+      "name": "Residential Income",
+      "description": "Residential income",
+      "type": "Income",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
     },
     {
-      "name": "Internship",
-      "description": "Google",
-      "updatedDate": "2025-05-26",
-      "id": "3b9a"
+      "id": "6284",
+      "name": "Rental income",
+      "description": "Rental",
+      "type": "Income",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
     },
     {
-      "id": "e869",
+      "id": "609f",
+      "name": "Royalty income",
+      "description": "royalty income",
+      "type": "Income",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
+    },
+    {
+      "id": "3cb9",
+      "name": "Taxable income",
+      "description": "taxes",
+      "type": "Income",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
+    },
+    {
+      "id": "13e4",
+      "name": "Shopping",
+      "description": "shop",
+      "type": "Expense",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
+    },
+    {
+      "id": "1397",
       "name": "Food",
-      "description": "Rice",
-      "createdDate": "2025-05-13",
-      "updatedDate": "2025-05-13"
+      "description": "fooding",
+      "type": "Expense",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
+    },
+    {
+      "id": "c30d",
+      "name": "Health",
+      "description": "Gym ",
+      "type": "Expense",
+      "createdDate": "2025-05-26",
+      "updatedDate": "2025-05-26"
     }
   ],
   "accounts": [
@@ -26,7 +62,7 @@
       "name": "Net Banking",
       "description": "Amazon Shopping",
       "initialAmount": 20000,
-      "balance": -6981,
+      "balance": -6881,
       "updatedDate": "2025-05-14",
       "id": "8858"
     },
@@ -35,7 +71,7 @@
       "name": "SBI",
       "description": "State Bank",
       "initialAmount": 121,
-      "balance": 2533,
+      "balance": 12234,
       "createdDate": "2025-05-12",
       "updatedDate": "2025-05-12"
     },
@@ -50,42 +86,60 @@
       "isDeleted": true
     },
     {
-      "id": "b184",
       "name": "Cash ",
-      "description": "500 Cash",
+      "description": "Paper Money",
       "initialAmount": 100,
-      "balance": 2412,
-      "createdDate": "2025-05-14",
-      "updatedDate": "2025-05-14"
+      "balance": 2012,
+      "updatedDate": "2025-05-26",
+      "id": "b184"
     }
   ],
   "records": [
     {
-      "id": "94e9",
-      "type": "expense",
+      "id": "8c9a",
+      "type": "income",
       "fromAccountId": "0628",
-      "categoryId": "e869",
-      "description": "Shopping",
-      "amount": 700,
-      "date": "2025-05-26T00:00:00Z"
+      "categoryId": "6284",
+      "description": "House Income",
+      "amount": 8000,
+      "date": "2025-05-26T11:46:38.209Z"
     },
     {
-      "id": "a47c",
+      "id": "c351",
       "type": "expense",
-      "fromAccountId": "0628",
-      "categoryId": "e869",
-      "description": "Shopping",
-      "amount": 1001,
-      "date": "2025-05-26T00:00:00Z"
+      "fromAccountId": "b184",
+      "categoryId": "1397",
+      "description": "testing",
+      "amount": 100,
+      "date": "2025-05-26T12:16:13.248Z"
     },
     {
-      "id": "3c5c",
+      "id": "1d30",
+      "type": "expense",
+      "fromAccountId": "b184",
+      "categoryId": "1397",
+      "description": "testing",
+      "amount": 200,
+      "date": "2025-05-26T13:34:17.383Z"
+    },
+    {
+      "id": "8f4b",
       "type": "income",
       "fromAccountId": "b184",
-      "categoryId": "e869",
-      "description": "income",
+      "categoryId": "c30d",
+      "description": "Shopping",
       "amount": 200,
-      "date": "2025-05-26T10:13:23.276Z"
+      "date": "2025-05-26T13:35:57.191Z"
+    },
+    {
+      "id": "1f23",
+      "type": "transfer",
+      "fromAccountId": "b184",
+      "toAccountId": "8858",
+      "categoryId": "0",
+      "description": "testing",
+      "amount": 100,
+      "date": "2025-05-27T05:29:39.573Z"
     }
   ]
 }

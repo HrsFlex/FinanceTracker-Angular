@@ -26,6 +26,14 @@
       Add Category
     </a>
   </div>
+  <div>
+    <label for="typeFilter">Filter by Type</label>
+    <select id="typeFilter" (change)="filterByType($event)">
+      <option value="All">All</option>
+      <option value="Income">Income</option>
+      <option value="Expense">Expense</option>
+    </select>
+  </div>
 
   <div class="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
     <table class="min-w-full text-gray-700">

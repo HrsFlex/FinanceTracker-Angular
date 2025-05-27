@@ -1,0 +1,306 @@
+<div class="gradient-bg text-white p-4 sm:p-6 mb-8">
+  <div class="container mx-auto">
+    <div
+      class="flex flex-col sm:flex-row items-start sm:items-center justify-between"
+    >
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-bold mb-2">Financial Dashboard</h1>
+        <p class="opacity-90 text-sm sm:text-base">
+          Manage your finances with ease
+        </p>
+      </div>
+      <div class="text-left sm:text-right mt-4 sm:mt-0">
+        <p class="text-xs sm:text-sm opacity-80">Last updated</p>
+        <p class="font-semibold text-sm sm:text-base">{{ lastUpdated }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container mx-auto px-4 pb-8">
+  <!-- Summary Cards -->
+  <div
+    class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 animate-fade-in"
+  >
+    <div
+      class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 card-hover border-l-4 border-green-500"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center mb-2">
+            <i class="fas fa-arrow-up text-green-500 mr-2"></i>
+            <h3 class="text-gray-600 font-medium text-sm sm:text-base">
+              Total Income
+            </h3>
+          </div>
+          <p class="text-xl sm:text-3xl font-bold text-green-600">
+            {{ totalIncome | currency : "INR" : "symbol" : "1.2-2" }}
+          </p>
+        </div>
+        <div class="bg-green-100 p-2 sm:p-4 rounded-full pulse-ring">
+          <i class="fas fa-wallet text-green-600 text-base sm:text-xl"></i>
+        </div>
+      </div>
+    </div>
+    <div
+      class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 card-hover border-l-4 border-red-500"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center mb-2">
+            <i class="fas fa-arrow-down text-red-500 mr-2"></i>
+            <h3 class="text-gray-600 font-medium text-sm sm:text-base">
+              Total Expense
+            </h3>
+          </div>
+          <p class="text-xl sm:text-3xl font-bold text-red-600">
+            {{ totalExpense | currency : "INR" : "symbol" : "1.2-2" }}
+          </p>
+        </div>
+        <div class="bg-red-100 p-2 sm:p-4 rounded-full">
+          <i class="fas fa-credit-card text-red-600 text-base sm:text-xl"></i>
+        </div>
+      </div>
+    </div>
+    <div
+      class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 card-hover border-l-4 border-blue-500"
+    >
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="flex items-center mb-2">
+            <i class="fas fa-balance-scale text-blue-500 mr-2"></i>
+            <h3 class="text-gray-600 font-medium text-sm sm:text-base">
+              Total Balance
+            </h3>
+          </div>
+          <p class="text-xl sm:text-3xl font-bold text-blue-600">
+            {{ totalBalance | currency : "INR" : "symbol" : "1.2-2" }}
+          </p>
+        </div>
+        <div class="bg-blue-100 p-2 sm:p-4 rounded-full">
+          <i class="fas fa-chart-line text-blue-600 text-base sm:text-xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Category Chart -->
+  <div
+    class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 card-hover mb-8 animate-slide-up"
+  >
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-lg sm:text-xl font-semibold text-gray-800">
+        Category Distribution
+      </h3>
+      <div class="flex space-x-2">
+        <button class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-expand-arrows-alt"></i>
+        </button>
+        <button class="text-gray-400 hover:text-gray-600">
+          <i class="fas fa-download"></i>
+        </button>
+      </div>
+    </div>
+    <div class="relative h-48 sm:h-64">
+      <canvas id="categoryChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Records Section -->
+  <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 mb-8 animate-slide-up">
+    <div
+      class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6"
+    >
+      <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-0">
+        Recent Transactions
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        <span
+          class="filter-chip px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-700"
+          [ngClass]="{ active: typeFilter === 'all' }"
+          (click)="filterRecords('all')"
+          >All</span
+        >
+        <span
+          class="filter-chip px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-700"
+          [ngClass]="{ active: typeFilter === 'income' }"
+          (click)="filterRecords('income')"
+        >
+          <i class="fas fa-arrow-up text-green-500 mr-1"></i>Income
+        </span>
+        <span
+          class="filter-chip px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-700"
+          [ngClass]="{ active: typeFilter === 'expense' }"
+          (click)="filterRecords('expense')"
+        >
+          <i class="fas fa-arrow-down text-red-500 mr-1"></i>Expense
+        </span>
+        <span
+          class="filter-chip px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-700"
+          [ngClass]="{ active: typeFilter === 'transfer' }"
+          (click)="filterRecords('transfer')"
+        >
+          <i class="fas fa-exchange-alt text-blue-500 mr-1"></i>Transfer
+        </span>
+      </div>
+    </div>
+    <div class="overflow-x-auto custom-scrollbar">
+      <table class="w-full table-auto">
+        <thead>
+          <tr class="border-b-2 border-gray-100">
+            <th
+              class="text-left py-2 sm:py-4 px-2 font-semibold text-gray-600 text-xs sm:text-sm"
+            >
+              Type
+            </th>
+            <th
+              class="text-left py-2 sm:py-4 px-2 font-semibold text-gray-600 text-xs sm:text-sm"
+            >
+              Account
+            </th>
+            <th
+              class="text-left py-2 sm:py-4 px-2 font-semibold text-gray-600 text-xs sm:text-sm"
+            >
+              Category
+            </th>
+            <th
+              class="text-left py-2 sm:py-4 px-2 font-semibold text-gray-600 text-xs sm:text-sm"
+            >
+              Description
+            </th>
+            <th
+              class="text-left py-2 sm:py-4 px-2 font-semibold text-gray-600 text-xs sm:text-sm"
+            >
+              Amount
+            </th>
+            <th
+              class="text-left py-2 sm:py-4 px-2 font-semibold text-gray-600 text-xs sm:text-sm"
+            >
+              Date
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            *ngFor="let displayRecord of displayedRecords"
+            class="border-b border-gray-50 hover:bg-gray-50 transition-colors duration-200"
+          >
+            <td class="py-2 sm:py-4 px-2">
+              <span
+                class="inline-flex items-center px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm"
+                [ngClass]="{
+                  'bg-green-100 text-green-800':
+                    displayRecord.record.type === 'income',
+                  'bg-red-100 text-red-800':
+                    displayRecord.record.type === 'expense',
+                  'bg-blue-100 text-blue-800':
+                    displayRecord.record.type === 'transfer'
+                }"
+              >
+                <span
+                  class="status-indicator"
+                  [ngClass]="{
+                    'status-positive': displayRecord.record.type === 'income',
+                    'status-negative': displayRecord.record.type === 'expense',
+                    'status-neutral': displayRecord.record.type === 'transfer'
+                  }"
+                ></span>
+                {{ displayRecord.record.type | titlecase }}
+              </span>
+            </td>
+            <td
+              class="py-2 sm:py-4 px-2 font-medium text-gray-800 text-xs sm:text-sm"
+            >
+              {{ displayRecord.accountName }}
+            </td>
+            <td class="py-2 sm:py-4 px-2 text-gray-600 text-xs sm:text-sm">
+              {{ displayRecord.categoryName }}
+            </td>
+            <td class="py-2 sm:py-4 px-2 text-gray-600 text-xs sm:text-sm">
+              {{ displayRecord.record.description }}
+            </td>
+            <td
+              class="py-2 sm:py-4 px-2 font-bold text-xs sm:text-sm"
+              [ngClass]="{
+                'text-green-600': displayRecord.record.type === 'income',
+                'text-red-600': displayRecord.record.type === 'expense',
+                'text-blue-600': displayRecord.record.type === 'transfer'
+              }"
+            >
+              {{
+                displayRecord.record.amount *
+                  (displayRecord.record.type === "expense" ? -1 : 1)
+                  | currency : "INR" : "symbol" : "1.2-2"
+              }}
+            </td>
+            <td class="py-2 sm:py-4 px-2 text-gray-500 text-xs sm:text-sm">
+              {{ displayRecord.record.date | date : "MMM d, yyyy" }}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="text-center mt-6">
+      <button
+        class="px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+        (click)="loadMore()"
+      >
+        <i class="fas fa-plus mr-2"></i>Load More Transactions
+      </button>
+    </div>
+  </div>
+
+  <!-- Accounts Overview -->
+  <div class="bg-white rounded-2xl shadow-lg p-4 sm:p-6 animate-slide-up">
+    <div
+      class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 sm:mb-6"
+    >
+      <h3 class="text-lg sm:text-xl font-semibold text-gray-800 mb-4 sm:mb-0">
+        Account Overview
+      </h3>
+      <button
+        class="px-3 sm:px-4 py-1 sm:py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200 text-xs sm:text-sm"
+        (click)="addAccount()"
+      >
+        <i class="fas fa-plus mr-2"></i>Add Account
+      </button>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div
+        *ngFor="let account of accounts"
+        class="rounded-xl p-4 sm:p-6 card-hover border"
+        [ngClass]="{
+          'bg-gradient-to-br from-blue-50 to-indigo-100 border-blue-200':
+            account.balance >= 0,
+          'bg-gradient-to-br from-red-50 to-pink-100 border-red-200':
+            account.balance < 0
+        }"
+      >
+        <div class="flex items-center justify-between mb-4">
+          <h4 class="font-semibold text-gray-800 text-sm sm:text-base">
+            {{ account.name }}
+          </h4>
+          <div
+            class="w-3 h-3 rounded-full"
+            [ngClass]="{
+              'bg-green-400': account.balance >= 0,
+              'bg-red-400': account.balance < 0
+            }"
+          ></div>
+        </div>
+        <p
+          class="text-lg sm:text-2xl font-bold mb-2"
+          [ngClass]="{
+            'text-gray-800': account.balance >= 0,
+            'text-red-600': account.balance < 0
+          }"
+        >
+          {{ account.balance | currency : "INR" : "symbol" : "1.2-2" }}
+        </p>
+        <!-- <div class="flex items-center text-xs sm:text-sm text-gray-600">
+          <i class="fas fa-info-circle mr-2"></i>{{ account.description }}
+        </div> -->
+      </div>
+    </div>
+  </div>
+</div>

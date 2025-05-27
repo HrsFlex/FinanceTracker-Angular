@@ -10,6 +10,10 @@ export interface Accounts {
 export interface Category {
   id?: string;
   name: string;
+  description: string;
+  createdDate?: string;
+  updatedDate?: string;
+  type: 'income' | 'expense' | 'transfer';
 }
 
 export interface Record {
@@ -24,7 +28,7 @@ export interface Record {
 }
 
 export interface RecordForm {
-  type: FormControl<string>;
+  type: FormControl<'income' | 'expense' | 'transfer'>;
   fromAccountId: FormControl<string | null>;
   toAccountId: FormControl<string | null>;
   categoryId: FormControl<string | null>;

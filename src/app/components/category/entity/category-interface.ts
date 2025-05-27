@@ -6,6 +6,7 @@ export interface Category {
   description: string;
   createdDate?: string;
   updatedDate?: string;
+  type: 'income' | 'expense';
 }
 
 export interface CategoryForm {
@@ -14,4 +15,5 @@ export interface CategoryForm {
   description: FormControl<string | null>;
   createdDate?: FormControl<string>;
   updatedDate?: FormControl<string>;
+  type: FormControl<string>;
 }

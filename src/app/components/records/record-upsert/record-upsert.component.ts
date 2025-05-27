@@ -192,7 +192,7 @@ export class RecordUpsertComponent implements OnInit {
           .then((confirmed) => {
             if (confirmed) {
               this.router.navigate(['/records']);
-              this.snackBar.open('Record deleted successfully!', 'Close', {
+              this.snackBar.open('Record Created successfully!', 'Close', {
                 duration: 3000,
               });
             }

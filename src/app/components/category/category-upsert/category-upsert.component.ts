@@ -16,6 +16,10 @@ export class CategoryUpsertComponent implements OnInit {
   categoryForm: FormGroup<CategoryForm> = new FormGroup<CategoryForm>({
     name: new FormControl<string>('', Validators.required),
     description: new FormControl<string>('', Validators.required),
+    type: new FormControl<'Income' | 'Expense'>('Income', {
+      nonNullable: true,
+      validators: [Validators.required],
+    }),
   });
 
   isEditing = false;

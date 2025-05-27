@@ -1,17 +1,19 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
-import { AccountServiceService } from 'src/app/services/account-service.service';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { CategoryService } from 'src/app/services/category-service.service';
+import { AccountServiceService } from 'src/app/services/account-service.service';
 import { RecordService } from 'src/app/services/record.service';
+// import { Category, Accounts, Record } from '../entity/record-interface';
+import { Chart, registerables } from 'chart.js';
+import { debounceTime } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import { Accounts, Category, Record } from '../records/entity/record-interface';
-import { debounceTime } from 'rxjs';
 
 @Component({
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css'],
+  selector: 'app-dashboard',
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.css'],
 })
-export class SidebarComponent implements OnInit, AfterViewInit {
+export class DashboardComponent implements OnInit, AfterViewInit {
   categories: Category[] = [];
   accounts: Accounts[] = [];
   records: Record[] = [];
@@ -25,13 +27,16 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     categoryName: string;
   }[] = [];
   lastUpdated: string = new Date().toLocaleTimeString();
+
   constructor(
     private categoryService: CategoryService,
     private accountService: AccountServiceService,
     private recordService: RecordService,
     private router: Router
-  ) {}
-  isCollapsed = false;
+  ) {
+    Chart.register(...registerables);
+  }
+
   ngOnInit(): void {
     this.loadData();
     this.categoryService
@@ -39,16 +44,13 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       .pipe(debounceTime(100))
       .subscribe(() => this.loadData());
     // Update timestamp every minute
-    // setInterval(() => this.updateTimestamp(), 60000);
+    setInterval(() => this.updateTimestamp(), 60000);
   }
 
   ngAfterViewInit(): void {
-    // this.renderCategoryChart();
+    this.renderCategoryChart();
   }
 
-  toggleSidebar() {
-    this.isCollapsed = !this.isCollapsed;
-  }
   private loadData(): void {
     // Load categories
     this.categoryService.getCategories(1, 100, 'name', 'All').subscribe({
@@ -58,6 +60,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
           type: cat.type.toLowerCase() as 'income' | 'expense' | 'transfer',
         }));
         this.updateDisplayedRecords();
+        this.renderCategoryChart();
       },
       error: (err) => console.error('Failed to load categories', err),
     });
@@ -87,6 +90,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         error: (err) => console.error('Failed to load records', err),
       });
   }
+
   private calculateTotals(): void {
     this.totalIncome = this.records
       .filter((rec) => rec.type === 'income')
@@ -107,5 +111,77 @@ export class SidebarComponent implements OnInit, AfterViewInit {
           'Unknown'
         : 'N/A',
     }));
+  }
+
+  private renderCategoryChart(): void {
+    const ctx = document.getElementById('categoryChart') as HTMLCanvasElement;
+    if (!ctx) return;
+
+    const categoryCounts = {
+      income: this.categories.filter((cat) => cat.type === 'income').length,
+      expense: this.categories.filter((cat) => cat.type === 'expense').length,
+      transfer: this.categories.filter((cat) => cat.type === 'transfer').length,
+    };
+
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Income', 'Expense', 'Transfer'],
+        datasets: [
+          {
+            data: [
+              categoryCounts.income,
+              categoryCounts.expense,
+              categoryCounts.transfer,
+            ],
+            backgroundColor: [
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(239, 68, 68, 0.8)',
+              'rgba(59, 130, 246, 0.8)',
+            ],
+            borderColor: [
+              'rgba(16, 185, 129, 1)',
+              'rgba(239, 68, 68, 1)',
+              'rgba(59, 130, 246, 1)',
+            ],
+            borderWidth: 2,
+            hoverOffset: 10,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              padding: 20,
+              usePointStyle: true,
+              font: { size: 12, family: 'Inter' },
+            },
+          },
+        },
+        cutout: '60%',
+      },
+    });
+  }
+
+  public filterRecords(type: 'all' | 'income' | 'expense' | 'transfer'): void {
+    this.typeFilter = type;
+    this.loadData();
+  }
+
+  private updateTimestamp(): void {
+    this.lastUpdated = new Date().toLocaleTimeString();
+  }
+
+  public addAccount(): void {
+    this.router.navigate(['/accounts-upsert']); // Adjust route as needed
+  }
+
+  public loadMore(): void {
+    // Implement pagination if needed
+    console.log('Load more transactions');
   }
 }

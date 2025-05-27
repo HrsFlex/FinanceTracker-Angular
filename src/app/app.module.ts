@@ -38,6 +38,7 @@ import { ConfirmDialogComponent } from './components/confirm-dialog/confirm-dial
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AlertDialogComponent } from './components/alert-dialog/alert-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
 
 @NgModule({
   declarations: [
@@ -55,6 +56,7 @@ import { MatDialogModule } from '@angular/material/dialog';
     RecordUpsertComponent,
     ConfirmDialogComponent,
     AlertDialogComponent,
+    DashboardComponent,
   ],
   imports: [
     BrowserModule,

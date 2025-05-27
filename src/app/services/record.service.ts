@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, forkJoin, throwError, of, Subject } from 'rxjs';
-import { switchMap, catchError } from 'rxjs/operators';
+import { switchMap, catchError, map } from 'rxjs/operators';
 import { environment } from 'src/enviroments/environment';
 import {
   Accounts,
@@ -19,7 +19,7 @@ export class RecordService {
 
   constructor(private http: HttpClient) {}
 
-  getRecords(
+  public getRecords(
     sortField: string = 'date',
     sortOrder: 'asc' | 'desc' = 'desc'
   ): Observable<Record[]> {
@@ -30,6 +30,34 @@ export class RecordService {
       params = params.set('_sort', sortValue);
     }
     return this.http.get<Record[]>(this.apiUrl, { params });
+  }
+  public getRecordsDashBoard(
+    page: number,
+    pageSize: number,
+    sortField: string,
+
+    typeFilter: 'all' | 'income' | 'expense' | 'transfer' = 'all'
+  ): Observable<{ records: Record[]; totalItems: number }> {
+    let params = new HttpParams()
+      .set('_page', page.toString())
+      .set('_limit', pageSize.toString())
+      .set('_sort', sortField);
+
+    if (typeFilter !== 'all') {
+      params = params.set('type', typeFilter);
+    }
+
+    return this.http
+      .get<Record[]>(this.apiUrl, {
+        params,
+        observe: 'response',
+      })
+      .pipe(
+        map((response) => ({
+          records: response.body || [],
+          totalItems: Number(response.headers.get('X-Total-Count')) || 0,
+        }))
+      );
   }
 
   getRecordById(id: string): Observable<Record> {

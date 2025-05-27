@@ -17,11 +17,11 @@ export class CategoryListComponent implements OnInit {
 
   // Remove 'keyof categories' because we'll send "-field" string
   public sortField: string = '-updatedDate'; // default: latest updated first
+  public typeFilter: 'All' | 'Income' | 'Expense' = 'All';
 
   constructor(
-    private categoryService: CategoryService
-  ) // private dialogService DialogService
-  {}
+    private categoryService: CategoryService // private dialogService DialogService
+  ) {}
 
   public ngOnInit(): void {
     this.loadCategories();
@@ -41,7 +41,12 @@ export class CategoryListComponent implements OnInit {
 
   public loadCategories(): void {
     this.categoryService
-      .getCategories(this.currentPage, this.pageSize, this.sortField)
+      .getCategories(
+        this.currentPage,
+        this.pageSize,
+        this.sortField,
+        this.typeFilter
+      )
       .subscribe({
         next: ({ categories, totalItems }) => {
           this.categories = categories;
@@ -84,5 +89,12 @@ export class CategoryListComponent implements OnInit {
         console.error('Error deleting Category:', error);
       },
     });
+  }
+
+  public filterByType(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    const value = target.value as 'All' | 'Income' | 'Expense';
+    this.typeFilter = value;
+    this.resetAndReload();
   }
 }

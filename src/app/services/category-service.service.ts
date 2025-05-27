@@ -17,12 +17,16 @@ export class CategoryService {
   public getCategories(
     page: number,
     pageSize: number, //if need to implement pagination
-    sortField: string
+    sortField: string,
+    typeFilter: 'All' | 'Income' | 'Expense' = 'All'
   ): Observable<{ categories: Category[]; totalItems: number }> {
-    const params = new HttpParams()
+    let params = new HttpParams()
       .set('_page', page.toString())
       .set('_limit', pageSize.toString())
       .set('_sort', sortField);
+    if (typeFilter !== 'All') {
+      params = params.set('type', typeFilter);
+    }
 
     return this.http
       .get<Category[]>(this.apiUrl, {
