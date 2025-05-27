@@ -1,60 +1,61 @@
 {
   "categories": [
     {
-      "id": "9fb5",
       "name": "Residential Income",
       "description": "Residential income",
-      "type": "Income",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "income",
+      "updatedDate": "2025-05-27",
+      "id": "9fb5"
     },
     {
-      "id": "6284",
       "name": "Rental income",
       "description": "Rental",
-      "type": "Income",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "income",
+      "updatedDate": "2025-05-27",
+      "id": "6284"
     },
     {
-      "id": "609f",
       "name": "Royalty income",
       "description": "royalty income",
-      "type": "Income",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "income",
+      "updatedDate": "2025-05-27",
+      "id": "609f"
     },
     {
-      "id": "3cb9",
       "name": "Taxable income",
       "description": "taxes",
-      "type": "Income",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "income",
+      "updatedDate": "2025-05-27",
+      "id": "3cb9"
     },
     {
-      "id": "13e4",
       "name": "Shopping",
       "description": "shop",
-      "type": "Expense",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "expense",
+      "updatedDate": "2025-05-27",
+      "id": "13e4"
     },
     {
-      "id": "1397",
       "name": "Food",
       "description": "fooding",
-      "type": "Expense",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "expense",
+      "updatedDate": "2025-05-27",
+      "id": "1397"
     },
     {
-      "id": "c30d",
       "name": "Health",
       "description": "Gym ",
-      "type": "Expense",
-      "createdDate": "2025-05-26",
-      "updatedDate": "2025-05-26"
+      "type": "expense",
+      "updatedDate": "2025-05-27",
+      "id": "c30d"
+    },
+    {
+      "id": "75c2",
+      "name": "Travel",
+      "description": "travelling",
+      "type": "expense",
+      "createdDate": "2025-05-27",
+      "updatedDate": "2025-05-27"
     }
   ],
   "accounts": [
@@ -62,8 +63,8 @@
       "name": "Net Banking",
       "description": "Amazon Shopping",
       "initialAmount": 20000,
-      "balance": -6881,
-      "updatedDate": "2025-05-14",
+      "balance": -300,
+      "updatedDate": "2025-05-27",
       "id": "8858"
     },
     {
@@ -71,7 +72,7 @@
       "name": "SBI",
       "description": "State Bank",
       "initialAmount": 121,
-      "balance": 12234,
+      "balance": 3234,
       "createdDate": "2025-05-12",
       "updatedDate": "2025-05-12"
     },
@@ -89,21 +90,22 @@
       "name": "Cash ",
       "description": "Paper Money",
       "initialAmount": 100,
-      "balance": 2012,
+      "balance": 2112,
       "updatedDate": "2025-05-26",
-      "id": "b184"
+      "id": "b184",
+      "isDeleted": true
+    },
+    {
+      "id": "af1a",
+      "name": "Savings Account",
+      "description": "HDFC",
+      "initialAmount": 0,
+      "balance": 1000,
+      "createdDate": "2025-05-27",
+      "updatedDate": "2025-05-27"
     }
   ],
   "records": [
-    {
-      "id": "8c9a",
-      "type": "income",
-      "fromAccountId": "0628",
-      "categoryId": "6284",
-      "description": "House Income",
-      "amount": 8000,
-      "date": "2025-05-26T11:46:38.209Z"
-    },
     {
       "id": "c351",
       "type": "expense",
@@ -126,9 +128,9 @@
       "id": "8f4b",
       "type": "income",
       "fromAccountId": "b184",
-      "categoryId": "c30d",
+      "categoryId": "9fb5",
       "description": "Shopping",
-      "amount": 200,
+      "amount": 300,
       "date": "2025-05-26T13:35:57.191Z"
     },
     {
@@ -140,6 +142,25 @@
       "description": "testing",
       "amount": 100,
       "date": "2025-05-27T05:29:39.573Z"
+    },
+    {
+      "id": "cb0e",
+      "type": "expense",
+      "fromAccountId": "8858",
+      "categoryId": "1397",
+      "description": "test",
+      "amount": 700,
+      "date": "2025-05-27T07:57:05.563Z"
+    },
+    {
+      "id": "061d",
+      "type": "transfer",
+      "fromAccountId": "0628",
+      "toAccountId": "af1a",
+      "categoryId": "0",
+      "description": "",
+      "amount": 1000,
+      "date": "2025-05-27T11:10:28.099Z"
     }
   ]
 }

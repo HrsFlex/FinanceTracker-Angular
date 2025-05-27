@@ -1,21 +1,25 @@
 <form
   [formGroup]="recordForm"
   (ngSubmit)="submitForm()"
-  class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-lg space-y-6"
+  class="max-w-2xl mx-auto bg-white p-8 rounded-2xl shadow-xl space-y-6 transition-all duration-300 ease-in-out"
 >
-  <h2 class="text-2xl font-bold text-blue-700 mb-6 text-center">
+  <h2
+    class="text-3xl font-semibold text-gray-800 mb-6 text-center tracking-tight"
+  >
     {{ isEditing ? "Edit Transaction" : "New Transaction" }}
   </h2>
 
   <!-- Transaction Type -->
-  <div>
-    <label for="type" class="block text-sm font-medium text-blue-900 mb-1"
-      >Transaction Type<span class="required-asterisk">*</span></label
-    >
+  <div class="space-y-2">
+    <label for="type" class="block text-sm font-medium text-gray-700 mb-1">
+      Transaction Type<span class="text-red-500 text-xs ml-1">*</span>
+    </label>
     <select
       id="type"
       formControlName="type"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+      aria-required="true"
+      aria-describedby="type-error"
     >
       <option *ngFor="let type of transactionTypes" [value]="type">
         {{ type | titlecase }}
@@ -23,23 +27,26 @@
     </select>
     <p
       *ngIf="recordForm.get('type')?.touched && recordForm.get('type')?.invalid"
-      class="text-red-500 text-xs mt-1"
+      class="text-red-500 text-xs mt-1 animate-fade-in"
     >
       Transaction type is required.
     </p>
   </div>
 
   <!-- From Account -->
-  <div>
+  <div class="space-y-2">
     <label
       for="fromAccountId"
-      class="block text-sm font-medium text-blue-900 mb-1"
-      >From Account<span class="required-asterisk">*</span></label
+      class="block text-sm font-medium text-gray-700 mb-1"
     >
+      From Account<span class="text-red-500 text-xs ml-1">*</span>
+    </label>
     <select
       id="fromAccountId"
       formControlName="fromAccountId"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+      aria-required="true"
+      aria-describedby="fromAccountId-error"
     >
       <option value="">Select Account</option>
       <option *ngFor="let account of accounts" [value]="account.id">
@@ -47,27 +54,31 @@
       </option>
     </select>
     <p
+      id="fromAccountId-error"
       *ngIf="
         recordForm.get('fromAccountId')?.touched &&
         recordForm.get('fromAccountId')?.invalid
       "
-      class="text-red-500 text-xs mt-1"
+      class="text-red-500 text-xs mt-1 animate-fade-in"
     >
       From account is required.
     </p>
   </div>
 
   <!-- To Account (Transfer only) -->
-  <div *ngIf="recordForm.get('type')?.value === 'transfer'">
+  <div *ngIf="recordForm.get('type')?.value === 'transfer'" class="space-y-2">
     <label
       for="toAccountId"
-      class="block text-sm font-medium text-blue-900 mb-1"
-      >To Account<span class="required-asterisk">*</span></label
+      class="block text-sm font-medium text-gray-700 mb-1"
     >
+      To Account<span class="text-red-500 text-xs ml-1">*</span>
+    </label>
     <select
       id="toAccountId"
       formControlName="toAccountId"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+      aria-required="true"
+      aria-describedby="toAccountId-error"
     >
       <option value="">Select Account</option>
       <option *ngFor="let account of accounts" [value]="account.id">
@@ -75,113 +86,146 @@
       </option>
     </select>
     <p
+      id="toAccountId-error"
       *ngIf="
         recordForm.get('toAccountId')?.touched &&
         recordForm.get('toAccountId')?.invalid
       "
-      class="text-red-500 text-xs mt-1"
+      class="text-red-500 text-xs mt-1 animate-fade-in"
     >
       To account is required for transfers.
     </p>
   </div>
 
   <!-- Category (Not transfer) -->
-  <div *ngIf="recordForm.get('type')?.value !== 'transfer'">
-    <label for="categoryId" class="block text-sm font-medium text-blue-900 mb-1"
-      >Category<span class="required-asterisk">*</span></label
+  <div *ngIf="recordForm.get('type')?.value !== 'transfer'" class="space-y-2">
+    <label
+      for="categoryId"
+      class="block text-sm font-medium text-gray-700 mb-1"
     >
+      Category<span class="text-red-500 text-xs ml-1">*</span>
+    </label>
     <select
       id="categoryId"
       formControlName="categoryId"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+      aria-required="true"
+      aria-describedby="categoryId-error"
     >
       <option value="">Select Category</option>
-      <option *ngFor="let category of categories" [value]="category.id">
+      <option *ngFor="let category of filteredCategories" [value]="category.id">
         {{ category.name }}
       </option>
     </select>
     <p
+      id="categoryId-error"
       *ngIf="
         recordForm.get('categoryId')?.touched &&
         recordForm.get('categoryId')?.invalid
       "
-      class="text-red-500 text-xs mt-1"
+      class="text-red-500 text-xs mt-1 animate-fade-in"
     >
       Category is required.
     </p>
   </div>
 
   <!-- Description -->
-  <div>
+  <div class="space-y-2">
     <label
       for="description"
-      class="block text-sm font-medium text-blue-900 mb-1"
-      >Description<span class="required-asterisk">*</span></label
+      class="block text-sm font-medium text-gray-700 mb-1"
     >
+      Description<span class="text-red-500 text-xs ml-1">*</span>
+    </label>
     <input
       id="description"
       formControlName="description"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+      aria-describedby="description-error"
     />
   </div>
 
   <!-- Amount -->
-  <div>
-    <label for="amount" class="block text-sm font-medium text-blue-900 mb-1"
-      >Amount<span class="required-asterisk">*</span></label
-    >
+  <div class="space-y-2">
+    <label for="amount" class="block text-sm font-medium text-gray-700 mb-1">
+      Amount<span class="text-red-500 text-xs ml-1">*</span>
+    </label>
     <input
       id="amount"
       type="number"
       formControlName="amount"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text-blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
+      step="0.01"
+      min="0.01"
+      aria-required="true"
+      aria-describedby="amount-error"
     />
     <p
+      id="amount-error"
       *ngIf="
         recordForm.get('amount')?.touched && recordForm.get('amount')?.invalid
       "
-      class="text-red-500 text-xs mt-1"
+      class="text-red-500 text-xs mt-1 animate-fade-in"
     >
       Amount must be a positive number.
     </p>
   </div>
 
   <!-- Date and Time -->
-  <div>
-    <label for="date" class="block text-sm font-medium text-blue-900 mb-1"
-      >Date and Time</label
-    >
+  <div class="space-y-2">
+    <label for="date" class="block text-sm font-medium text-gray-700 mb-1">
+      Date and Time
+    </label>
     <input
       id="date"
       type="datetime-local"
       formControlName="date"
-      class="w-full border border-blue-300 rounded-xl px-4 py-2 text:blue-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      class="w-full border border-gray-300 rounded-lg px-4 py-3 text-gray-800 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors duration-200"
       [value]="recordForm.get('date')?.value | date : 'yyyy-MM-ddTHH:mm'"
       (change)="onDateChange($event)"
+      aria-required="true"
+      aria-describedby="date-error"
     />
     <p
       *ngIf="recordForm.get('date')?.touched && recordForm.get('date')?.invalid"
-      class="text-red-500 text-xs mt-1"
+      class="text-red-500 text-xs mt-1 animate-fade-in"
     >
       Date and time are required.
     </p>
   </div>
 
   <!-- Submit Button -->
-  <div class="pt-4 flex space-x-4">
+  <div class="pt-6 flex space-x-4">
     <button
       type="submit"
-      [disabled]="recordForm.invalid"
-      class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+      [disabled]="recordForm.invalid || isSubmitting"
+      class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
     >
       {{ isEditing ? "Update Record" : "Save Record" }}
     </button>
     <button
       type="button"
       (click)="cancelEdit()"
-      class="w-full bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 rounded-xl transition-all"
+      class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
     >
       Cancel
     </button>
   </div>
 </form>
+
+<style>
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+</style>

@@ -22,10 +22,11 @@ export class RecordUpsertComponent implements OnInit {
   recordForm!: FormGroup<RecordForm>;
   accounts: Accounts[] = [];
   categories: Category[] = [];
+  filteredCategories: Category[] = [];
   transactionTypes = ['income', 'expense', 'transfer'];
   recordId: string | null = null;
   isEditing: boolean = false;
-  isSubmitting: boolean = false; // Add loading state
+  isSubmitting: boolean = false;
 
   constructor(
     private accountService: AccountServiceService,
@@ -61,44 +62,139 @@ export class RecordUpsertComponent implements OnInit {
 
   ngOnInit(): void {
     this.recordId = this.route.snapshot.paramMap.get('id');
-    console.log('Record ID from route:', this.recordId); // Debug: Verify ID
+    console.log('Record ID from route:', this.recordId);
+
     if (this.recordId) {
       this.isEditing = true;
-      this.loadRecordForEdit(this.recordId);
-    } else {
-      console.log('Creating new record');
     }
-    this.loadAccounts();
-    this.loadCategories();
+
+    // Setup the type watcher first
     this.setupTypeWatcher();
+
+    // Load data
+    this.loadAccounts();
+    this.loadCategories().then(() => {
+      // After categories are loaded, load record for edit if needed
+      if (this.recordId) {
+        this.loadRecordForEdit(this.recordId);
+      }
+    });
   }
 
   public loadAccounts() {
     this.accountService.getAccounts(1, 100, 'name').subscribe({
-      next: (data) => (this.accounts = data.accounts || []),
+      next: (data) => {
+        this.accounts = data.accounts || [];
+        console.log('Accounts loaded:', this.accounts);
+      },
       error: (err) => console.error('Failed to load accounts', err),
     });
   }
 
-  public loadCategories() {
-    this.categoryService.getCategories(1, 100, 'name').subscribe({
-      next: (data) => (this.categories = data.categories || []),
-      error: (err) => console.error('Failed to load categories', err),
+  public loadCategories(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      // Make sure we're getting all categories without any type filter
+      this.categoryService.getCategories(1, 100, 'name', 'All').subscribe({
+        next: (data) => {
+          this.categories = data.categories || [];
+          console.log('=== CATEGORY DEBUG INFO ===');
+          console.log('All categories loaded:', this.categories);
+          console.log('Number of categories:', this.categories.length);
+
+          // Log each category's details
+          this.categories.forEach((cat, index) => {
+            console.log(`Category ${index + 1}:`, {
+              id: cat.id,
+              name: cat.name,
+              type: cat.type,
+              description: cat.description,
+            });
+          });
+
+          // Check what types we have
+          const types = this.categories.map((cat) => cat.type);
+          const uniqueTypes = [...new Set(types)];
+          console.log('Unique category types found:', uniqueTypes);
+
+          // Initialize filtered categories based on current form type
+          const currentType = this.recordForm.get('type')?.value;
+          console.log('Current form type:', currentType);
+          this.filterCategories(currentType);
+
+          resolve();
+        },
+        error: (err) => {
+          console.error('Failed to load categories', err);
+          reject(err);
+        },
+      });
     });
   }
+
   public onDateChange(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.value) {
-      // Convert datetime-local value (YYYY-MM-DDTHH:mm) to ISO string
-      const isoDate = `${input.value}:00Z`; // Append seconds and UTC
+      const isoDate = `${input.value}:00Z`;
       this.recordForm.get('date')?.setValue(isoDate);
     }
   }
 
+  private filterCategories(
+    type: 'income' | 'expense' | 'transfer' | null | undefined
+  ) {
+    if (type === undefined) {
+      // Handle undefined case - maybe show all categories or use a default
+      return;
+    }
+    console.log('=== FILTERING CATEGORIES ===');
+    console.log('Requested type:', type);
+    console.log('Available categories before filtering:', this.categories);
+
+    if (type === 'transfer') {
+      this.filteredCategories = [];
+      console.log('Transfer type - no categories needed');
+    } else if (type === 'income' || type === 'expense') {
+      // Filter categories that match the exact type
+      this.filteredCategories = this.categories.filter((category) => {
+        const matches = category.type === type;
+        console.log(
+          `Category "${category.name}" (type: "${category.type}") matches "${type}": ${matches}`
+        );
+        return matches;
+      });
+      console.log(`Filtered categories for ${type}:`, this.filteredCategories);
+      console.log(
+        `Found ${this.filteredCategories.length} categories for type "${type}"`
+      );
+    } else {
+      this.filteredCategories = [];
+      console.log('No valid type provided - clearing categories');
+    }
+
+    // Reset categoryId if the current selection is no longer valid
+    const currentCategoryId = this.recordForm.get('categoryId')?.value;
+    if (
+      currentCategoryId &&
+      !this.filteredCategories.some((cat) => cat.id === currentCategoryId)
+    ) {
+      console.log(
+        'Resetting categoryId as current selection is no longer valid'
+      );
+      this.recordForm.get('categoryId')?.setValue(null);
+    }
+
+    console.log('Final filteredCategories:', this.filteredCategories);
+    console.log('=== END FILTERING ===');
+  }
+
   public setupTypeWatcher() {
     this.recordForm.get('type')?.valueChanges.subscribe((type) => {
+      console.log('Transaction type changed to:', type);
       const toAccount = this.recordForm.get('toAccountId');
       const category = this.recordForm.get('categoryId');
+
+      // Filter categories based on type
+      this.filterCategories(type);
 
       if (type === 'transfer') {
         toAccount?.addValidators([Validators.required]);
@@ -114,22 +210,26 @@ export class RecordUpsertComponent implements OnInit {
   }
 
   private loadRecordForEdit(id: string): void {
-    //Solverd the date time issue.
     this.recordService.getRecordById(id.toString()).subscribe({
       next: (record) => {
-        console.log('Loaded record:', record); // Debug: Verify record data
+        console.log('Loaded record for editing:', record);
         const dateValue = record.date.includes('T')
           ? record.date
-          : `${record.date}T00:00:00Z`; // Add default time if missing
-        this.recordForm.get('type')?.setValue(record.type);
-        this.recordForm.get('fromAccountId')?.setValue(record.fromAccountId);
-        this.recordForm
-          .get('toAccountId')
-          ?.setValue(record.toAccountId ?? null);
-        this.recordForm.get('categoryId')?.setValue(record.categoryId ?? null);
-        this.recordForm.get('description')?.setValue(record.description);
-        this.recordForm.get('amount')?.setValue(record.amount);
-        this.recordForm.get('date')?.setValue(dateValue);
+          : `${record.date}T00:00:00Z`;
+
+        // Set form values
+        this.recordForm.patchValue({
+          type: record.type,
+          fromAccountId: record.fromAccountId,
+          toAccountId: record.toAccountId ?? null,
+          categoryId: record.categoryId ?? null,
+          description: record.description,
+          amount: record.amount,
+          date: dateValue,
+        });
+
+        // Trigger filtering after setting the type
+        this.filterCategories(record.type);
       },
       error: (err) => {
         console.error('Failed to load record', err);
@@ -141,16 +241,16 @@ export class RecordUpsertComponent implements OnInit {
       },
     });
   }
+
   public submitForm() {
     if (this.recordForm.invalid) {
       this.recordForm.markAllAsTouched();
       return;
     }
-    this.isSubmitting = true; // Disable submission
+    this.isSubmitting = true;
     const formValue = this.recordForm.getRawValue();
     const type = formValue.type as 'income' | 'expense' | 'transfer';
 
-    // Validate required fields based on type
     if (
       formValue.fromAccountId === null ||
       formValue.amount === null ||
@@ -161,6 +261,7 @@ export class RecordUpsertComponent implements OnInit {
         'Validation Error',
         'Form contains invalid or incomplete data.'
       );
+      this.isSubmitting = false;
       return;
     }
 
@@ -169,7 +270,7 @@ export class RecordUpsertComponent implements OnInit {
       type,
       fromAccountId: formValue.fromAccountId,
       toAccountId: type === 'transfer' ? formValue.toAccountId! : undefined,
-      categoryId: type !== 'transfer' ? formValue.categoryId! : '0', // dummy or backend-handled
+      categoryId: type !== 'transfer' ? formValue.categoryId! : '0',
       description: formValue.description,
       amount: formValue.amount,
       date: formValue.date,
@@ -183,7 +284,7 @@ export class RecordUpsertComponent implements OnInit {
 
     request.subscribe({
       next: () => {
-        this.isSubmitting = false; // Re-enable after success
+        this.isSubmitting = false;
         this.dialogService
           .confirm(
             'Success',
@@ -192,13 +293,14 @@ export class RecordUpsertComponent implements OnInit {
           .then((confirmed) => {
             if (confirmed) {
               this.router.navigate(['/records']);
-              this.snackBar.open('Record Created successfully!', 'Close', {
+              this.snackBar.open('Record saved successfully!', 'Close', {
                 duration: 3000,
               });
             }
           });
       },
       error: (err) => {
+        this.isSubmitting = false;
         this.dialogService.alert(
           'Error',
           `Failed to ${this.isEditing ? 'update' : 'save'} record: ${

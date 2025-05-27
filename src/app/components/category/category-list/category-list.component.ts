@@ -17,7 +17,7 @@ export class CategoryListComponent implements OnInit {
 
   // Remove 'keyof categories' because we'll send "-field" string
   public sortField: string = '-updatedDate'; // default: latest updated first
-  public typeFilter: 'All' | 'Income' | 'Expense' = 'All';
+  public typeFilter: 'All' | 'income' | 'expense' = 'All';
 
   constructor(
     private categoryService: CategoryService // private dialogService DialogService
@@ -93,7 +93,7 @@ export class CategoryListComponent implements OnInit {
 
   public filterByType(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    const value = target.value as 'All' | 'Income' | 'Expense';
+    const value = target.value as 'All' | 'income' | 'expense';
     this.typeFilter = value;
     this.resetAndReload();
   }

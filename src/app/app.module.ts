@@ -39,6 +39,15 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { AlertDialogComponent } from './components/alert-dialog/alert-dialog.component';
 import { MatDialogModule } from '@angular/material/dialog';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { ProfileComponent } from './components/profile/profile.component';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { group } from '@angular/animations';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { NgChartsModule } from 'ng2-charts';
+import { DatePipe } from '@angular/common';
+import { ReportsComponent } from './components/reports/reports.component';
 
 @NgModule({
   declarations: [
@@ -57,6 +66,8 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     ConfirmDialogComponent,
     AlertDialogComponent,
     DashboardComponent,
+    ProfileComponent,
+    ReportsComponent,
   ],
   imports: [
     BrowserModule,
@@ -67,17 +78,10 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     ReactiveFormsModule,
     MatSnackBarModule,
 
-    // RouterModule.forRoot([
-    //   { path: 'record-upsert', component: RecordUpsertComponent },
-    //   { path: 'records', component: RecordsComponent },
-    //   { path: 'category-list', component: RecordsComponent }, // Replace with actual component
-    //   { path: 'accounts-items', component: RecordsComponent }, // Replace with actual component
-    //   { path: 'profile', component: RecordsComponent }, // Replace with actual component
-    //   { path: '', redirectTo: '/records', pathMatch: 'full' },
-    // ]),
-    // Material modules
+    BrowserModule,
     MatDialogModule,
     MatFormFieldModule,
+    MatSelectModule,
     MatInputModule,
     MatButtonModule,
     MatIconModule,
@@ -86,8 +90,20 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
     MatSortModule,
     MatCardModule,
     BrowserAnimationsModule,
+
+    MatTableModule,
+
+    MatFormFieldModule,
+    MatSelectModule,
+    MatButtonToggleModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    ReactiveFormsModule,
+    HttpClientModule,
+    NgChartsModule,
   ],
-  providers: [AccountServiceService, CategoryService, RecordService],
+  providers: [AccountServiceService, CategoryService, RecordService, DatePipe],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

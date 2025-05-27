@@ -216,28 +216,21 @@ export class RecordService {
       .get<Accounts>(`${this.accountsUrl}/${String(fromAccountId)}`)
       .pipe(
         switchMap((fromAccount) => {
-          if (type === 'expense' || type === 'transfer') {
-            if (fromAccount.balance < amount) {
-              return throwError(
-                () => new Error('Insufficient balance in from account')
-              );
-            }
-          }
-
+          // Prepare balance updates
           const updates: Observable<any>[] = [];
+          const fromBalanceUpdate =
+            type === 'income'
+              ? fromAccount.balance + amount
+              : fromAccount.balance - amount;
 
-          let fromBalanceUpdate: number;
-          if (type === 'income') {
-            fromBalanceUpdate = fromAccount.balance + amount;
-          } else {
-            fromBalanceUpdate = fromAccount.balance - amount;
-          }
+          // Update fromAccount balance
           updates.push(
             this.http.patch(`${this.accountsUrl}/${String(fromAccountId)}`, {
               balance: fromBalanceUpdate,
             })
           );
 
+          // Handle transfer to toAccount
           if (type === 'transfer' && toAccountId) {
             return this.http
               .get<Accounts>(`${this.accountsUrl}/${String(toAccountId)}`)
@@ -247,7 +240,9 @@ export class RecordService {
                   updates.push(
                     this.http.patch(
                       `${this.accountsUrl}/${String(toAccountId)}`,
-                      { balance: toBalanceUpdate }
+                      {
+                        balance: toBalanceUpdate,
+                      }
                     )
                   );
                   return forkJoin(updates);
