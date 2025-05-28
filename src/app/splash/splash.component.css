@@ -1,0 +1,56 @@
+/* src/app/splash/splash.component.css */
+.splash-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    background-color: #ffff;
+    /* Black background, change to #ffffff if white is intended */
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    opacity: 0;
+    /* Start transparent for fade-in */
+    animation: fadeIn 0.3s ease-in forwards;
+    /* Smooth container fade-in */
+}
+
+.logo-container {
+    display: flex;
+    justify-content: center;
+    will-change: transform, opacity;
+    /* Optimize for animation */
+}
+
+.logo {
+    width: 100vw;
+    /* Takes half viewport width */
+    height: 100vh;
+    /* Takes half viewport height */
+    object-fit: contain;
+    /* Maintains aspect ratio */
+    margin: auto;
+    /* Centers the logo */
+    display: block;
+    /* Ensures margin auto works */
+}
+
+/* Keyframes for container fade-in */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* For full screen version, add this class */
+.logo-full {
+    width: 100vw;
+    height: 100vh;
+    object-fit: contain;
+}

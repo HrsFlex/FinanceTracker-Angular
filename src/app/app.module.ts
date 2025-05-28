@@ -50,6 +50,7 @@ import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ReportsComponent } from './components/reports/reports.component';
 import { TransactionDialogComponent } from './components/transaction-dialog/transaction-dialog.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
+import { SplashComponent } from './splash/splash.component';
 
 @NgModule({
   declarations: [
@@ -72,6 +73,7 @@ import { CalendarComponent } from './components/calendar/calendar.component';
     ReportsComponent,
     TransactionDialogComponent,
     CalendarComponent,
+    SplashComponent,
   ],
   imports: [
     BrowserModule,

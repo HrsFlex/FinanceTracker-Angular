@@ -11,9 +11,10 @@ import { RecordUpsertComponent } from './components/records/record-upsert/record
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ReportsComponent } from './components/reports/reports.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
+import { SplashComponent } from './splash/splash.component';
 
 const routes: Routes = [
-  { path: '', component: DashboardComponent },
+  { path: '', component: SplashComponent },
   { path: 'category-list', component: CategoryListComponent },
   { path: 'category-upsert/:id', component: CategoryUpsertComponent },
   { path: 'category-upsert', component: CategoryUpsertComponent },
