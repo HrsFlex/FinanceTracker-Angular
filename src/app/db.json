@@ -1,27 +1,6 @@
 {
   "categories": [
     {
-      "name": "Residential Income",
-      "description": "Residential income",
-      "type": "income",
-      "updatedDate": "2025-05-27",
-      "id": "9fb5"
-    },
-    {
-      "name": "Rental income",
-      "description": "Rental",
-      "type": "income",
-      "updatedDate": "2025-05-27",
-      "id": "6284"
-    },
-    {
-      "name": "Royalty income",
-      "description": "royalty income",
-      "type": "income",
-      "updatedDate": "2025-05-27",
-      "id": "609f"
-    },
-    {
       "name": "Taxable income",
       "description": "taxes",
       "type": "income",
@@ -56,6 +35,54 @@
       "type": "expense",
       "createdDate": "2025-05-27",
       "updatedDate": "2025-05-27"
+    },
+    {
+      "id": "cb6e",
+      "name": "Rental income",
+      "description": "Rental Income ",
+      "type": "income",
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "c4fd",
+      "name": "Awards",
+      "description": "Award winner ",
+      "type": "income",
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "dac6",
+      "name": "Coupons",
+      "description": "Gift Coupons ",
+      "type": "income",
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "6c2b",
+      "name": "Refunds",
+      "description": "Refunds",
+      "type": "income",
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "8d2c",
+      "name": "Salary",
+      "description": "Salary",
+      "type": "income",
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "9f20",
+      "name": "Car",
+      "description": "Car Maintenance ",
+      "type": "expense",
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
     }
   ],
   "accounts": [
@@ -96,13 +123,12 @@
       "isDeleted": true
     },
     {
-      "id": "af1a",
       "name": "Savings Account",
       "description": "HDFC",
       "initialAmount": 0,
       "balance": 1300,
-      "createdDate": "2025-05-27",
-      "updatedDate": "2025-05-27"
+      "updatedDate": "2025-05-28",
+      "id": "af1a"
     },
     {
       "id": "2976",
@@ -112,6 +138,15 @@
       "balance": 4500,
       "createdDate": "2025-05-28",
       "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "efc6",
+      "name": "Cash",
+      "description": "Cash Account",
+      "initialAmount": 0,
+      "balance": 500,
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
     }
   ],
   "records": [
@@ -119,7 +154,7 @@
       "id": "8f4b",
       "type": "income",
       "fromAccountId": "af1a",
-      "categoryId": "9fb5",
+      "categoryId": null,
       "description": "Shopping",
       "amount": 300,
       "date": "2025-05-26T13:35:57.191Z"

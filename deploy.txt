@@ -1,0 +1,26 @@
+//   "scripts": {
+//     "ng": "ng",
+//     "start:json": "json-server --watch src/app/db.json --host 0.0.0.0 --port 3000",
+//     "start:ng": "ng serve --host 0.0.0.0 --proxy-config proxy.conf.json",
+//     "start": "concurrently \"npm run start:json\" \"npm run start:ng\"",
+//     "build": "ng build",
+//     "watch": "ng build --watch --configuration development",
+//     "test": "ng test"
+//   },
+
+
+
+proxy.conf.json
+{
+  "/api": {
+    "target": "http://192.168.1.34:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}
+
+
+change the env file

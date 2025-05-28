@@ -13,7 +13,7 @@ import { ReportsComponent } from './components/reports/reports.component';
 import { CalendarComponent } from './components/calendar/calendar.component';
 
 const routes: Routes = [
-  { path: '', component: LoginComponent },
+  { path: '', component: DashboardComponent },
   { path: 'category-list', component: CategoryListComponent },
   { path: 'category-upsert/:id', component: CategoryUpsertComponent },
   { path: 'category-upsert', component: CategoryUpsertComponent },
