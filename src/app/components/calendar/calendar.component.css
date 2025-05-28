@@ -559,3 +559,36 @@
         font-size: 0.7rem;
     }
 }
+
+/* Transaction Actions */
+.transaction-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.edit-btn,
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+    background-color: #e9ecef;
+}
+
+.delete-btn:hover {
+    background-color: #f8d7da;
+}
+
+.edit-btn svg {
+    stroke: #007bff;
+}
+
+.delete-btn svg {
+    stroke: #dc3545;
+}

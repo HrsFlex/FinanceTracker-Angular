@@ -100,7 +100,7 @@
       "name": "Savings Account",
       "description": "HDFC",
       "initialAmount": 0,
-      "balance": 1000,
+      "balance": 1300,
       "createdDate": "2025-05-27",
       "updatedDate": "2025-05-27"
     },
@@ -116,27 +116,9 @@
   ],
   "records": [
     {
-      "id": "c351",
-      "type": "expense",
-      "fromAccountId": "b184",
-      "categoryId": "1397",
-      "description": "testing",
-      "amount": 100,
-      "date": "2025-05-26T12:16:13.248Z"
-    },
-    {
-      "id": "1d30",
-      "type": "expense",
-      "fromAccountId": "b184",
-      "categoryId": "1397",
-      "description": "testing",
-      "amount": 200,
-      "date": "2025-05-26T13:34:17.383Z"
-    },
-    {
       "id": "8f4b",
       "type": "income",
-      "fromAccountId": "b184",
+      "fromAccountId": "af1a",
       "categoryId": "9fb5",
       "description": "Shopping",
       "amount": 300,
@@ -157,7 +139,7 @@
       "fromAccountId": "0628",
       "toAccountId": "af1a",
       "categoryId": "0",
-      "description": "",
+      "description": "testing",
       "amount": 1000,
       "date": "2025-05-27T11:10:28.099Z"
     },

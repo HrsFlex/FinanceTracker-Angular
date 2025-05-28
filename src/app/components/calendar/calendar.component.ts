@@ -8,7 +8,8 @@ import {
   CalendarService,
   MonthlyTransactionData,
 } from 'src/app/services/calendar.service';
-import { CurrencyPipe } from '@angular/common';
+import { Router } from '@angular/router';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-calendar',
@@ -37,7 +38,9 @@ export class CalendarComponent implements OnInit, OnDestroy {
 
   constructor(
     private calendarService: CalendarService,
-    private recordService: RecordService
+    private recordService: RecordService,
+    private router: Router,
+    public dialogService: DialogService
   ) {}
 
   ngOnInit() {
@@ -74,6 +77,45 @@ export class CalendarComponent implements OnInit, OnDestroy {
     this.calendarDays = this.calendarService.generateCalendarDays(year, month);
     this.monthlyData.year = year;
     this.monthlyData.month = month;
+  }
+
+  /**
+   * Navigate to record-upsert component with transaction ID for editing
+   */
+  editTransaction(transactionId: string | undefined) {
+    if (transactionId) {
+      this.router.navigate(['/record-upsert', transactionId]);
+    }
+  }
+
+  /**
+   * Delete a transaction and refresh the calendar
+   */
+  async deleteTransaction(transactionId: string | undefined) {
+    if (!transactionId) return;
+
+    const confirmed = await this.dialogService.confirm(
+      'Delete Transaction',
+      'Are you sure you want to delete this transaction?'
+    );
+
+    if (!confirmed) return;
+
+    this.isLoading = true;
+    this.recordService.deleteRecord(transactionId).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.loadTransactionsForMonth(); // Reload calendar data after deletion
+      },
+      error: (error) => {
+        console.error('Error deleting transaction:', error);
+        this.isLoading = false;
+        this.dialogService.alert(
+          'Error',
+          'Failed to delete transaction. Please try again.'
+        );
+      },
+    });
   }
 
   /**
