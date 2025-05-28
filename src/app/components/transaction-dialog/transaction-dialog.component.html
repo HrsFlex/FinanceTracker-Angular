@@ -1,0 +1,30 @@
+<!-- src/app/components/transaction-dialog/transaction-dialog.component.html -->
+<h2 mat-dialog-title>
+  Transactions for {{ data.date | date : "MMMM d, yyyy" }}
+</h2>
+<mat-dialog-content>
+  <div *ngIf="data.transactions.length === 0" class="text-gray-500">
+    No transactions on this day.
+  </div>
+  <div
+    *ngFor="let transaction of data.transactions"
+    class="mb-4 p-4 bg-gray-50 rounded"
+  >
+    <p><strong>Type:</strong> {{ transaction.type | titlecase }}</p>
+    <p><strong>Amount:</strong> {{ transaction.amount | currency }}</p>
+    <p><strong>From Account:</strong> {{ transaction.fromAccountId }}</p>
+    <p *ngIf="transaction.toAccountId">
+      <strong>To Account:</strong> {{ transaction.toAccountId }}
+    </p>
+    <p *ngIf="transaction.categoryId !== '0'">
+      <strong>Category:</strong> {{ transaction.categoryId }}
+    </p>
+    <p *ngIf="transaction.description">
+      <strong>Description:</strong> {{ transaction.description }}
+    </p>
+    <p><strong>Date:</strong> {{ transaction.date | date : "short" }}</p>
+  </div>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

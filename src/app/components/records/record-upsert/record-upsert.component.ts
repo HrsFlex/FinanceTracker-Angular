@@ -277,41 +277,53 @@ export class RecordUpsertComponent implements OnInit {
     };
     console.log('Submitting record:', record);
 
-    const request =
-      this.isEditing && this.recordId
-        ? this.recordService.updateRecord(record)
-        : this.recordService.createRecord(record);
+    this.dialogService
+      .confirm(
+        'Confirmation',
+        `Are you sure you want to ${
+          this.isEditing ? 'update' : 'save'
+        } this record?`
+      )
+      .then((confirmed) => {
+        if (confirmed) {
+          const request =
+            this.isEditing && this.recordId
+              ? this.recordService.updateRecord(record)
+              : this.recordService.createRecord(record);
 
-    request.subscribe({
-      next: () => {
-        this.isSubmitting = false;
-        this.dialogService
-          .confirm(
-            'Success',
-            `Are you sure to ${this.isEditing ? 'update' : 'save'} the data?`
-          )
-          .then((confirmed) => {
-            if (confirmed) {
+          request.subscribe({
+            next: () => {
+              this.isSubmitting = false;
               this.router.navigate(['/records']);
               this.snackBar.open('Record saved successfully!', 'Close', {
                 duration: 3000,
               });
-            }
+            },
+            error: (err) => {
+              this.isSubmitting = false;
+              this.dialogService.alert(
+                'Error',
+                `Failed to ${this.isEditing ? 'update' : 'save'} record: ${
+                  err.message
+                }`
+              );
+            },
           });
-      },
-      error: (err) => {
-        this.isSubmitting = false;
-        this.dialogService.alert(
-          'Error',
-          `Failed to ${this.isEditing ? 'update' : 'save'} record: ${
-            err.message
-          }`
-        );
-      },
-    });
+        } else {
+          this.isSubmitting = false;
+        }
+      });
   }
 
   public cancelEdit() {
-    this.router.navigate(['/records']);
+    this.recordForm.reset({
+      type: 'expense',
+      fromAccountId: null,
+      toAccountId: null,
+      categoryId: null,
+      description: '',
+      amount: null,
+      date: new Date().toISOString(),
+    });
   }
 }

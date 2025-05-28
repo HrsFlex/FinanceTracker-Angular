@@ -1,0 +1,735 @@
+<div class="calendar-container">
+  <!-- Calendar Header with Navigation and Summary -->
+  <div class="calendar-header">
+    <div class="header-top">
+      <div class="month-navigation">
+        <button
+          class="nav-btn"
+          (click)="previousMonth()"
+          [disabled]="isLoading"
+          aria-label="Previous month"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="15,18 9,12 15,6"></polyline>
+          </svg>
+        </button>
+
+        <h1 class="current-month">{{ currentMonthYear }}</h1>
+
+        <button
+          class="nav-btn"
+          (click)="nextMonth()"
+          [disabled]="isLoading"
+          aria-label="Next month"
+        >
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <polyline points="9,6 15,12 9,18"></polyline>
+          </svg>
+        </button>
+      </div>
+
+      <button
+        class="today-btn"
+        (click)="goToToday()"
+        [class.active]="isCurrentMonthToday()"
+        [disabled]="isLoading"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="16" y1="2" x2="16" y2="6"></line>
+          <line x1="8" y1="2" x2="8" y2="6"></line>
+          <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        Today
+      </button>
+    </div>
+
+    <!-- Monthly Summary -->
+    <div class="monthly-summary" *ngIf="!isLoading">
+      <div class="summary-item income">
+        <div class="summary-label">Total Income</div>
+        <div class="summary-value">
+          {{ monthlyData.totalIncome | currency : "INR" : "symbol" : "1.2-2" }}
+        </div>
+      </div>
+      <div class="summary-item expense">
+        <div class="summary-label">Total Expenses</div>
+        <div class="summary-value">
+          {{ monthlyData.totalExpense | currency : "INR" : "symbol" : "1.2-2" }}
+        </div>
+      </div>
+      <div
+        class="summary-item net"
+        [class.positive]="monthlyNetAmount >= 0"
+        [class.negative]="monthlyNetAmount < 0"
+      >
+        <div class="summary-label">Net Amount</div>
+        <div class="summary-value">
+          {{ monthlyNetAmount | currency : "INR" : "symbol" : "1.2-2" }}
+        </div>
+      </div>
+      <div class="summary-item transactions">
+        <div class="summary-label">Transactions</div>
+        <div class="summary-value">{{ monthlyData.totalTransactions }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <div class="loading-content">
+      <div class="loading-spinner"></div>
+      <p>Loading transactions...</p>
+    </div>
+  </div>
+
+  <!-- Calendar Grid -->
+  <div class="calendar-grid" [class.loading]="isLoading">
+    <!-- Day Headers -->
+    <div class="day-header" *ngFor="let day of dayHeaders">
+      {{ day }}
+    </div>
+
+    <!-- Calendar Days -->
+    <div
+      *ngFor="let day of calendarDays; trackBy: trackByDate"
+      class="calendar-day"
+      [class.other-month]="!day.isCurrentMonth"
+      [class.today]="day.isToday"
+      [class.selected]="day.isSelected"
+      [class.has-transactions]="day.transactionCount > 0"
+      [class.has-income]="day.totalIncome > 0"
+      [class.has-expense]="day.totalExpense > 0"
+      (click)="selectDate(day)"
+    >
+      <div class="day-content">
+        <div class="day-number">{{ day.date.getDate() }}</div>
+
+        <!-- Transaction Indicators -->
+        <div class="transaction-indicators" *ngIf="day.transactionCount > 0">
+          <div class="indicator-badges">
+            <div class="income-badge" *ngIf="day.totalIncome > 0">
+              <span class="badge-icon">↗</span>
+              <span class="badge-amount">{{
+                day.totalIncome | currency : "INR" : "symbol" : "1.0-0"
+              }}</span>
+            </div>
+            <div class="expense-badge" *ngIf="day.totalExpense > 0">
+              <span class="badge-icon">↘</span>
+              <span class="badge-amount">{{
+                day.totalExpense | currency : "INR" : "symbol" : "1.0-0"
+              }}</span>
+            </div>
+          </div>
+          <div class="transaction-count" *ngIf="day.transactionCount > 0">
+            {{ day.transactionCount }}
+            {{ day.transactionCount === 1 ? "transaction" : "transactions" }}
+          </div>
+        </div>
+
+        <!-- Empty state for days without transactions -->
+        <div
+          class="no-transactions"
+          *ngIf="day.transactionCount === 0 && day.isCurrentMonth"
+        >
+          <div class="empty-dot"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selected Date Details -->
+  <div class="selected-date-panel" *ngIf="selectedDay">
+    <div class="panel-header">
+      <div class="selected-date-info">
+        <h3>{{ selectedDateFormatted }}</h3>
+        <div class="date-summary" *ngIf="selectedDay.transactionCount > 0">
+          <span
+            class="summary-badge income"
+            *ngIf="selectedDay.totalIncome > 0"
+          >
+            Income:
+            {{
+              selectedDay.totalIncome | currency : "INR" : "symbol" : "1.2-2"
+            }}
+          </span>
+          <span
+            class="summary-badge expense"
+            *ngIf="selectedDay.totalExpense > 0"
+          >
+            Expenses:
+            {{
+              selectedDay.totalExpense | currency : "INR" : "symbol" : "1.2-2"
+            }}
+          </span>
+          <span
+            class="summary-badge net"
+            [class.positive]="
+              selectedDay.totalIncome - selectedDay.totalExpense >= 0
+            "
+            [class.negative]="
+              selectedDay.totalIncome - selectedDay.totalExpense < 0
+            "
+          >
+            Net:
+            {{
+              selectedDay.totalIncome - selectedDay.totalExpense
+                | currency : "INR" : "symbol" : "1.2-2"
+            }}
+          </span>
+        </div>
+      </div>
+      <button
+        class="close-btn"
+        (click)="selectedDay = null"
+        aria-label="Close details"
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Transactions List -->
+    <div
+      class="transactions-container"
+      *ngIf="selectedDay.transactions.length > 0"
+    >
+      <div class="transactions-list">
+        <div
+          *ngFor="
+            let transaction of selectedDay.transactions;
+            trackBy: trackByTransactionId
+          "
+          class="transaction-item"
+          [ngClass]="getTransactionClass(transaction.type)"
+        >
+          <div class="transaction-icon">
+            <div class="icon-wrapper" [ngClass]="'icon-' + transaction.type">
+              <svg
+                *ngIf="transaction.type === 'income'"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19,12 12,5 5,12"></polyline>
+              </svg>
+              <svg
+                *ngIf="transaction.type === 'expense'"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <polyline points="19,12 12,19 5,12"></polyline>
+              </svg>
+              <svg
+                *ngIf="transaction.type === 'transfer'"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <polyline points="17,11 21,7 17,3"></polyline>
+                <line x1="21" y1="7" x2="9" y2="7"></line>
+                <polyline points="7,21 3,17 7,13"></polyline>
+                <line x1="21" y1="17" x2="9" y2="17"></line>
+              </svg>
+            </div>
+          </div>
+
+          <div class="transaction-details">
+            <div class="transaction-main">
+              <div class="transaction-description">
+                {{ transaction.description }}
+              </div>
+              <div
+                class="transaction-amount"
+                [class.positive]="transaction.type === 'income'"
+                [class.negative]="transaction.type === 'expense'"
+                [class.neutral]="transaction.type === 'transfer'"
+              >
+                <span class="amount-sign" *ngIf="transaction.type === 'income'"
+                  >+</span
+                >
+                <span class="amount-sign" *ngIf="transaction.type === 'expense'"
+                  >-</span
+                >
+                {{ transaction.amount | currency : "INR" : "symbol" : "1.2-2" }}
+              </div>
+            </div>
+            <div class="transaction-meta">
+              <div class="account-info">
+                <span class="from-account">{{ transaction.fromAccount }}</span>
+                <span
+                  class="transfer-arrow"
+                  *ngIf="transaction.type === 'transfer'"
+                >
+                  →
+                </span>
+                <span class="to-account" *ngIf="transaction.toAccount">{{
+                  transaction.toAccount
+                }}</span>
+              </div>
+              <div class="category-info" *ngIf="transaction.category">
+                <span class="category-tag">{{ transaction.category }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- No Transactions Message -->
+    <div
+      class="no-transactions-message"
+      *ngIf="selectedDay.transactions.length === 0"
+    >
+      <div class="empty-state">
+        <div class="empty-icon">
+          <div class="calendar-container">
+            <!-- Calendar Header with Navigation and Summary -->
+            <div class="calendar-header">
+              <div class="header-top">
+                <div class="month-navigation">
+                  <button
+                    class="nav-btn"
+                    (click)="previousMonth()"
+                    [disabled]="isLoading"
+                    aria-label="Previous month"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="15,18 9,12 15,6"></polyline>
+                    </svg>
+                  </button>
+
+                  <h1 class="current-month">{{ currentMonthYear }}</h1>
+
+                  <button
+                    class="nav-btn"
+                    (click)="nextMonth()"
+                    [disabled]="isLoading"
+                    aria-label="Next month"
+                  >
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <polyline points="9,6 15,12 9,18"></polyline>
+                    </svg>
+                  </button>
+                </div>
+
+                <button
+                  class="today-btn"
+                  (click)="goToToday()"
+                  [class.active]="isCurrentMonthToday()"
+                  [disabled]="isLoading"
+                >
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <rect
+                      x="3"
+                      y="4"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      ry="2"
+                    ></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                  </svg>
+                  Today
+                </button>
+              </div>
+
+              <!-- Monthly Summary -->
+              <div class="monthly-summary" *ngIf="!isLoading">
+                <div class="summary-item income">
+                  <div class="summary-label">Total Income</div>
+                  <div class="summary-value">
+                    {{
+                      monthlyData.totalIncome
+                        | currency : "INR" : "symbol" : "1.2-2"
+                    }}
+                  </div>
+                </div>
+                <div class="summary-item expense">
+                  <div class="summary-label">Total Expenses</div>
+                  <div class="summary-value">
+                    {{
+                      monthlyData.totalExpense
+                        | currency : "INR" : "symbol" : "1.2-2"
+                    }}
+                  </div>
+                </div>
+                <div
+                  class="summary-item net"
+                  [class.positive]="monthlyNetAmount >= 0"
+                  [class.negative]="monthlyNetAmount < 0"
+                >
+                  <div class="summary-label">Net Amount</div>
+                  <div class="summary-value">
+                    {{
+                      monthlyNetAmount | currency : "INR" : "symbol" : "1.2-2"
+                    }}
+                  </div>
+                </div>
+                <div class="summary-item transactions">
+                  <div class="summary-label">Transactions</div>
+                  <div class="summary-value">
+                    {{ monthlyData.totalTransactions }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-overlay" *ngIf="isLoading">
+              <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <p>Loading transactions...</p>
+              </div>
+            </div>
+
+            <!-- Calendar Grid -->
+            <div class="calendar-grid" [class.loading]="isLoading">
+              <!-- Day Headers -->
+              <div class="day-header" *ngFor="let day of dayHeaders">
+                {{ day }}
+              </div>
+
+              <!-- Calendar Days -->
+              <div
+                *ngFor="let day of calendarDays; trackBy: trackByDate"
+                class="calendar-day"
+                [class.other-month]="!day.isCurrentMonth"
+                [class.today]="day.isToday"
+                [class.selected]="day.isSelected"
+                [class.has-transactions]="day.transactionCount > 0"
+                [class.has-income]="day.totalIncome > 0"
+                [class.has-expense]="day.totalExpense > 0"
+                (click)="selectDate(day)"
+              >
+                <div class="day-content">
+                  <div class="day-number">{{ day.date.getDate() }}</div>
+
+                  <!-- Transaction Indicators -->
+                  <div
+                    class="transaction-indicators"
+                    *ngIf="day.transactionCount > 0"
+                  >
+                    <div class="indicator-badges">
+                      <div class="income-badge" *ngIf="day.totalIncome > 0">
+                        <span class="badge-icon">↗</span>
+                        <span class="badge-amount">{{
+                          day.totalIncome
+                            | currency : "INR" : "symbol" : "1.0-0"
+                        }}</span>
+                      </div>
+                      <div class="expense-badge" *ngIf="day.totalExpense > 0">
+                        <span class="badge-icon">↘</span>
+                        <span class="badge-amount">{{
+                          day.totalExpense
+                            | currency : "INR" : "symbol" : "1.0-0"
+                        }}</span>
+                      </div>
+                    </div>
+                    <div
+                      class="transaction-count"
+                      *ngIf="day.transactionCount > 0"
+                    >
+                      {{ day.transactionCount }}
+                      {{
+                        day.transactionCount === 1
+                          ? "transaction"
+                          : "transactions"
+                      }}
+                    </div>
+                  </div>
+
+                  <!-- Empty state for days without transactions -->
+                  <div
+                    class="no-transactions"
+                    *ngIf="day.transactionCount === 0 && day.isCurrentMonth"
+                  >
+                    <div class="empty-dot"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Selected Date Details -->
+            <div class="selected-date-panel" *ngIf="selectedDay">
+              <div class="panel-header">
+                <div class="selected-date-info">
+                  <h3>{{ selectedDateFormatted }}</h3>
+                  <div
+                    class="date-summary"
+                    *ngIf="selectedDay.transactionCount > 0"
+                  >
+                    <span
+                      class="summary-badge income"
+                      *ngIf="selectedDay.totalIncome > 0"
+                    >
+                      Income:
+                      {{
+                        selectedDay.totalIncome
+                          | currency : "INR" : "symbol" : "1.2-2"
+                      }}
+                    </span>
+                    <span
+                      class="summary-badge expense"
+                      *ngIf="selectedDay.totalExpense > 0"
+                    >
+                      Expenses:
+                      {{
+                        selectedDay.totalExpense
+                          | currency : "INR" : "symbol" : "1.2-2"
+                      }}
+                    </span>
+                    <span
+                      class="summary-badge net"
+                      [class.positive]="
+                        selectedDay.totalIncome - selectedDay.totalExpense >= 0
+                      "
+                      [class.negative]="
+                        selectedDay.totalIncome - selectedDay.totalExpense < 0
+                      "
+                    >
+                      Net:
+                      {{
+                        selectedDay.totalIncome - selectedDay.totalExpense
+                          | currency : "INR" : "symbol" : "1.2-2"
+                      }}
+                    </span>
+                  </div>
+                </div>
+                <button
+                  class="close-btn"
+                  (click)="selectedDay = null"
+                  aria-label="Close details"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Transactions List -->
+              <div
+                class="transactions-container"
+                *ngIf="selectedDay.transactions.length > 0"
+              >
+                <div class="transactions-list">
+                  <div
+                    *ngFor="
+                      let transaction of selectedDay.transactions;
+                      trackBy: trackByTransactionId
+                    "
+                    class="transaction-item"
+                    [ngClass]="getTransactionClass(transaction.type)"
+                  >
+                    <div class="transaction-icon">
+                      <div
+                        class="icon-wrapper"
+                        [ngClass]="'icon-' + transaction.type"
+                      >
+                        <svg
+                          *ngIf="transaction.type === 'income'"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <line x1="12" y1="5" x2="12" y2="19"></line>
+                          <polyline points="19,12 12,5 5,12"></polyline>
+                        </svg>
+                        <svg
+                          *ngIf="transaction.type === 'expense'"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <line x1="12" y1="5" x2="12" y2="19"></line>
+                          <polyline points="19,12 12,19 5,12"></polyline>
+                        </svg>
+                        <svg
+                          *ngIf="transaction.type === 'transfer'"
+                          width="18"
+                          height="18"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <polyline points="17,11 21,7 17,3"></polyline>
+                          <line x1="21" y1="7" x2="9" y2="7"></line>
+                          <polyline points="7,21 3,17 7,13"></polyline>
+                          <line x1="21" y1="17" x2="9" y2="17"></line>
+                        </svg>
+                      </div>
+                    </div>
+
+                    <div class="transaction-details">
+                      <div class="transaction-main">
+                        <div class="transaction-description">
+                          {{ transaction.description }}
+                        </div>
+                        <div
+                          class="transaction-amount"
+                          [class.positive]="transaction.type === 'income'"
+                          [class.negative]="transaction.type === 'expense'"
+                          [class.neutral]="transaction.type === 'transfer'"
+                        >
+                          <span
+                            class="amount-sign"
+                            *ngIf="transaction.type === 'income'"
+                            >+</span
+                          >
+                          <span
+                            class="amount-sign"
+                            *ngIf="transaction.type === 'expense'"
+                            >-</span
+                          >
+                          {{
+                            transaction.amount
+                              | currency : "INR" : "symbol" : "1.2-2"
+                          }}
+                        </div>
+                      </div>
+                      <div class="transaction-meta">
+                        <div class="account-info">
+                          <span class="from-account">{{
+                            transaction.fromAccount
+                          }}</span>
+                          <span
+                            class="transfer-arrow"
+                            *ngIf="transaction.type === 'transfer'"
+                          >
+                            →
+                          </span>
+                          <span
+                            class="to-account"
+                            *ngIf="transaction.toAccount"
+                            >{{ transaction.toAccount }}</span
+                          >
+                        </div>
+                        <div class="category-info" *ngIf="transaction.category">
+                          <span class="category-tag">{{
+                            transaction.category
+                          }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- No Transactions Message -->
+              <div
+                class="no-transactions-message"
+                *ngIf="selectedDay.transactions.length === 0"
+              >
+                <div class="empty-state">
+                  <div class="empty-icon">
+                    <svg
+                      width="48"
+                      height="48"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect
+                        x="3"
+                        y="4"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        ry="2"
+                      ></rect>
+                      <line x1="16" y1="2" x2="16" y2="6"></line>
+                      <line x1="8" y1="2" x2="8" y2="6"></line>
+                      <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                  </div>
+                  <p>No transactions on this date.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

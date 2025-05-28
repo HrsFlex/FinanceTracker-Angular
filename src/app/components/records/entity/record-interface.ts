@@ -53,3 +53,8 @@ export interface DisplayRecord {
   date: string; // Formatted date and time, e.g., "May 19, 2025, 12:12 PM"
   sortDate: string;
 }
+
+export interface CalendarEvent {
+  date: string; // YYYY-MM-DD
+  transactions: Record[];
+}

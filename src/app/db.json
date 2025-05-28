@@ -63,7 +63,7 @@
       "name": "Net Banking",
       "description": "Amazon Shopping",
       "initialAmount": 20000,
-      "balance": -300,
+      "balance": -500,
       "updatedDate": "2025-05-27",
       "id": "8858"
     },
@@ -90,7 +90,7 @@
       "name": "Cash ",
       "description": "Paper Money",
       "initialAmount": 100,
-      "balance": 2112,
+      "balance": 2212,
       "updatedDate": "2025-05-26",
       "id": "b184",
       "isDeleted": true
@@ -103,6 +103,15 @@
       "balance": 1000,
       "createdDate": "2025-05-27",
       "updatedDate": "2025-05-27"
+    },
+    {
+      "id": "2976",
+      "name": "Credit Card",
+      "description": "PNB",
+      "initialAmount": 0,
+      "balance": 4500,
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28"
     }
   ],
   "records": [
@@ -134,16 +143,6 @@
       "date": "2025-05-26T13:35:57.191Z"
     },
     {
-      "id": "1f23",
-      "type": "transfer",
-      "fromAccountId": "b184",
-      "toAccountId": "8858",
-      "categoryId": "0",
-      "description": "testing",
-      "amount": 100,
-      "date": "2025-05-27T05:29:39.573Z"
-    },
-    {
       "id": "cb0e",
       "type": "expense",
       "fromAccountId": "8858",
@@ -161,6 +160,24 @@
       "description": "",
       "amount": 1000,
       "date": "2025-05-27T11:10:28.099Z"
+    },
+    {
+      "id": "75a0",
+      "type": "expense",
+      "fromAccountId": "8858",
+      "categoryId": "1397",
+      "description": "testing",
+      "amount": 100,
+      "date": "2025-05-28T06:06:39.205Z"
+    },
+    {
+      "id": "5667",
+      "type": "expense",
+      "fromAccountId": "2976",
+      "categoryId": "1397",
+      "description": "testing",
+      "amount": 500,
+      "date": "2025-05-28T06:29:03.830Z"
     }
   ]
 }

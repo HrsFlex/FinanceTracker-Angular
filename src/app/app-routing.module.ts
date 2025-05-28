@@ -10,6 +10,7 @@ import { RecordsComponent } from './components/records/record-list/records.compo
 import { RecordUpsertComponent } from './components/records/record-upsert/record-upsert.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ReportsComponent } from './components/reports/reports.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
 
 const routes: Routes = [
   { path: '', component: LoginComponent },
@@ -25,6 +26,7 @@ const routes: Routes = [
   { path: 'record-upsert/:id', component: RecordUpsertComponent },
   { path: 'dashboard', component: DashboardComponent },
   { path: 'reports', component: ReportsComponent },
+  { path: 'calender', component: CalendarComponent },
 ];
 
 @NgModule({

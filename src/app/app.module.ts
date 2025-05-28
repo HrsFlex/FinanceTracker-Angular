@@ -46,8 +46,10 @@ import { group } from '@angular/animations';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { NgChartsModule } from 'ng2-charts';
-import { DatePipe } from '@angular/common';
+import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ReportsComponent } from './components/reports/reports.component';
+import { TransactionDialogComponent } from './components/transaction-dialog/transaction-dialog.component';
+import { CalendarComponent } from './components/calendar/calendar.component';
 
 @NgModule({
   declarations: [
@@ -68,6 +70,8 @@ import { ReportsComponent } from './components/reports/reports.component';
     DashboardComponent,
     ProfileComponent,
     ReportsComponent,
+    TransactionDialogComponent,
+    CalendarComponent,
   ],
   imports: [
     BrowserModule,
@@ -77,7 +81,6 @@ import { ReportsComponent } from './components/reports/reports.component';
     HttpClientModule,
     ReactiveFormsModule,
     MatSnackBarModule,
-
     BrowserModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -90,6 +93,8 @@ import { ReportsComponent } from './components/reports/reports.component';
     MatSortModule,
     MatCardModule,
     BrowserAnimationsModule,
+    CurrencyPipe,
+    CommonModule,
 
     MatTableModule,
 

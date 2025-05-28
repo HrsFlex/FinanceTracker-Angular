@@ -1,0 +1,561 @@
+/* General container styling */
+.calendar-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background-color: #f8f9fa;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Calendar Header */
+.calendar-header {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px 8px 0 0;
+}
+
+.header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.month-navigation {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.nav-btn:hover:not(:disabled) {
+    background-color: #e9ecef;
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.current-month {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.today-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #007bff;
+    border-radius: 20px;
+    background-color: transparent;
+    color: #007bff;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.today-btn:hover:not(:disabled) {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.today-btn.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.today-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Monthly Summary */
+.monthly-summary {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    padding: 15px;
+    background-color: #f1f3f5;
+    border-radius: 8px;
+}
+
+.summary-item {
+    flex: 1;
+    min-width: 150px;
+    text-align: center;
+}
+
+.summary-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+}
+
+.summary-value {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+.summary-item.income .summary-value {
+    color: #28a745;
+}
+
+.summary-item.expense .summary-value {
+    color: #dc3545;
+}
+
+.summary-item.net.positive .summary-value {
+    color: #28a745;
+}
+
+.summary-item.net.negative .summary-value {
+    color: #dc3545;
+}
+
+.summary-item.transactions .summary-value {
+    color: #343a40;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.loading-content {
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #007bff;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Calendar Grid */
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    background-color: #e9ecef;
+    border-radius: 0 0 8px 8px;
+    padding: 2px;
+    position: relative;
+}
+
+.calendar-grid.loading {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.day-header {
+    background-color: #ffffff;
+    text-align: center;
+    padding: 10px;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.calendar-day {
+    background-color: #ffffff;
+    min-height: 120px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.calendar-day:hover {
+    background-color: #f1f3f5;
+}
+
+.calendar-day.other-month {
+    background-color: #f8f9fa;
+    color: #adb5bd;
+}
+
+.calendar-day.today {
+    border: 2px solid #007bff;
+    border-radius: 4px;
+}
+
+.calendar-day.selected {
+    background-color: #e7f1ff;
+    border: 2px solid #0056b3;
+}
+
+.calendar-day.has-transactions {
+    background-color: #fff3cd;
+}
+
+.day-content {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.day-number {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.transaction-indicators {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.indicator-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.income-badge,
+.expense-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+}
+
+.income-badge {
+    background-color: #d4edda;
+    color: #28a745;
+}
+
+.expense-badge {
+    background-color: #f8d7da;
+    color: #dc3545;
+}
+
+.badge-icon {
+    font-size: 0.9rem;
+}
+
+.transaction-count {
+    font-size: 0.8rem;
+    color: #6c757d;
+}
+
+.no-transactions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.empty-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #dee2e6;
+    border-radius: 50%;
+}
+
+/* Selected Date Panel */
+.selected-date-panel {
+    margin-top: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.selected-date-info h3 {
+    margin: 0;
+    font-size: 1.3rem;
+    color: #1a1a1a;
+}
+
+.date-summary {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.summary-badge {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+}
+
+.summary-badge.income {
+    background-color: #d4edda;
+    color: #28a745;
+}
+
+.summary-badge.expense {
+    background-color: #f8d7da;
+    color: #dc3545;
+}
+
+.summary-badge.net.positive {
+    background-color: #d4edda;
+    color: #28a745;
+}
+
+.summary-badge.net.negative {
+    background-color: #f8d7da;
+    color: #dc3545;
+}
+
+.close-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    transition: background-color 0.2s;
+}
+
+.close-btn:hover {
+    background-color: #e9ecef;
+}
+
+/* Transactions List */
+.transactions-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.transactions-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.transaction-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.transaction-item:hover {
+    background-color: #f8f9fa;
+}
+
+.transaction-item.transaction-income {
+    background-color: #e6f4ea;
+}
+
+.transaction-item.transaction-expense {
+    background-color: #fcedef;
+}
+
+.transaction-item.transaction-transfer {
+    background-color: #e9ecef;
+}
+
+.transaction-icon {
+    flex-shrink: 0;
+}
+
+.icon-wrapper {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+}
+
+.icon-income {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.icon-expense {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.icon-transfer {
+    background-color: #6c757d;
+    color: #fff;
+}
+
+.transaction-details {
+    flex: 1;
+}
+
+.transaction-main {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transaction-description {
+    font-weight: 500;
+    color: #1a1a1a;
+}
+
+.transaction-amount {
+    font-weight: 600;
+}
+
+.transaction-amount.positive {
+    color: #28a745;
+}
+
+.transaction-amount.negative {
+    color: #dc3545;
+}
+
+.transaction-amount.neutral {
+    color: #6c757d;
+}
+
+.amount-sign {
+    margin-right: 4px;
+}
+
+.transaction-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+.account-info {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.transfer-arrow {
+    color: #6c757d;
+}
+
+.category-tag {
+    background-color: #e9ecef;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+/* No Transactions Message */
+.no-transactions-message {
+    text-align: center;
+    padding: 20px;
+    color: #6c757d;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.empty-icon {
+    opacity: 0.5;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .calendar-container {
+        padding: 10px;
+    }
+
+    .calendar-grid {
+        grid-template-columns: repeat(7, minmax(0, 1fr));
+    }
+
+    .calendar-day {
+        min-height: 80px;
+        padding: 5px;
+    }
+
+    .day-number {
+        font-size: 0.9rem;
+    }
+
+    .monthly-summary {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .summary-item {
+        width: 100%;
+        text-align: left;
+    }
+
+    .month-navigation {
+        gap: 10px;
+    }
+
+    .current-month {
+        font-size: 1.2rem;
+    }
+
+    .today-btn {
+        padding: 6px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .calendar-day {
+        min-height: 60px;
+    }
+
+    .day-number {
+        font-size: 0.8rem;
+    }
+
+    .income-badge,
+    .expense-badge {
+        font-size: 0.75rem;
+        padding: 3px 6px;
+    }
+
+    .transaction-count {
+        font-size: 0.7rem;
+    }
+}

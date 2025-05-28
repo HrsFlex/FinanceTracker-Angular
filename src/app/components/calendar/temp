@@ -1,0 +1,130 @@
+// src/app/components/calendar/calendar.component.ts
+import { Component, OnInit } from '@angular/core';
+import { RecordService } from '../../services/record.service';
+import { MatDialog } from '@angular/material/dialog';
+import { TransactionDialogComponent } from '../transaction-dialog/transaction-dialog.component';
+import { DisplayRecord, Record } from '../records/entity/record-interface';
+
+@Component({
+  selector: 'app-calendar',
+  templateUrl: './calendar.component.html',
+  styleUrls: ['./calendar.component.css'],
+})
+export class CalendarComponent implements OnInit {
+  currentDate: Date = new Date();
+  daysInMonth: { day: number; transactions: DisplayRecord[] }[] = [];
+  selectedDate?: Date;
+  selectedTransactions: DisplayRecord[] = [];
+  months = [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ];
+
+  constructor(
+    private recordService: RecordService,
+    private dialog: MatDialog
+  ) {}
+
+  ngOnInit(): void {
+    this.loadMonth(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() + 1
+    );
+  }
+  get emptyDaysAtStart(): number[] {
+    const firstDay = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth(),
+      1
+    ).getDay();
+    return Array(firstDay).fill(0);
+  }
+
+  loadMonth(year: number, month: number): void {
+    this.recordService
+      .getTransactionsByMonth(year, month)
+      .subscribe((transactions) => {
+        const days = this.getDaysInMonth(year, month);
+        this.daysInMonth = days.map((day) => ({
+          day,
+          transactions: transactions.filter(
+            (t) =>
+              new Date(t.date).getDate() === day &&
+              new Date(t.date).getMonth() + 1 === month &&
+              new Date(t.date).getFullYear() === year
+          ),
+        }));
+      });
+  }
+
+  getDaysInMonth(year: number, month: number): number[] {
+    const days = new Date(year, month, 0).getDate();
+    return Array.from({ length: days }, (_, i) => i + 1);
+  }
+
+  selectDate(day: number): void {
+    this.selectedDate = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth(),
+      day
+    );
+    this.selectedTransactions =
+      this.daysInMonth.find((d) => d.day === day)?.transactions || [];
+    this.dialog.open(TransactionDialogComponent, {
+      data: {
+        date: this.selectedDate,
+        transactions: this.selectedTransactions,
+      },
+      width: '500px',
+    });
+  }
+
+  previousMonth(): void {
+    this.currentDate = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() - 1,
+      1
+    );
+    this.loadMonth(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() + 1
+    );
+    this.selectedDate = undefined;
+    this.selectedTransactions = [];
+  }
+
+  nextMonth(): void {
+    this.currentDate = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() + 1,
+      1
+    );
+    this.loadMonth(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth() + 1
+    );
+    this.selectedDate = undefined;
+    this.selectedTransactions = [];
+  }
+
+  getDayClass(day: number): string {
+    const hasTransactions =
+      this.daysInMonth.find((d) => d.day === day)?.transactions?.length ??
+      0 > 0;
+    const isSelected =
+      this.selectedDate &&
+      this.selectedDate.getDate() === day &&
+      this.selectedDate.getMonth() === this.currentDate.getMonth();
+    return hasTransactions ? 'has-transactions' : isSelected ? 'selected' : '';
+  }
+}

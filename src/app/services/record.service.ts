@@ -5,6 +5,7 @@ import { switchMap, catchError, map } from 'rxjs/operators';
 import { environment } from 'src/enviroments/environment';
 import {
   Accounts,
+  DisplayRecord,
   Record,
 } from '../components/records/entity/record-interface';
 
@@ -31,6 +32,19 @@ export class RecordService {
     }
     return this.http.get<Record[]>(this.apiUrl, { params });
   }
+  public getDisplayRecord(
+    sortField: string = 'date',
+    sortOrder: 'asc' | 'desc' = 'desc'
+  ): Observable<DisplayRecord[]> {
+    let params = new HttpParams();
+    if (sortField) {
+      const sortValue =
+        sortOrder === 'desc' ? `-${sortField},-id` : `${sortField},id`;
+      params = params.set('_sort', sortValue);
+    }
+    return this.http.get<DisplayRecord[]>(this.apiUrl, { params });
+  }
+
   public getRecordsDashBoard(
     page: number,
     pageSize: number,
@@ -68,6 +82,29 @@ export class RecordService {
           throwError(() => new Error('Failed to fetch record: ' + err.message))
         )
       );
+  }
+
+  getTransactionsByMonth(
+    year: number,
+    month: number
+  ): Observable<DisplayRecord[]> {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0); // Last day of the month
+    const startStr = startDate.toISOString().split('T')[0]; // YYYY-MM-DD
+    const endStr = endDate.toISOString().split('T')[0];
+
+    return this.http.get<DisplayRecord[]>(this.apiUrl).pipe(
+      map((records) =>
+        records.filter((record) => {
+          const recordDate = record.date.split('T')[0];
+          return recordDate >= startStr && recordDate <= endStr;
+        })
+      ),
+      catchError((err) => {
+        console.error('Error fetching transactions:', err);
+        return of([]);
+      })
+    );
   }
 
   createRecord(record: Record): Observable<Record> {
