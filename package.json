@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start:json": "json-server --watch src/app/db.json --host 0.0.0.0 --port 3000",
+    "start:ng": "ng serve --host 0.0.0.0 --proxy-config proxy.conf.json",
+    "start": "concurrently \"npm run start:json\" \"npm run start:ng\"",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
@@ -27,7 +29,7 @@
     "ng2-charts": "^5.0.4",
     "rxjs": "^7.8.2",
     "tslib": "^2.3.0",
-    "zone.js": "^0.14.10"
+    "zone.js": "^0.13.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "^16.2.16",
@@ -36,6 +38,7 @@
     "@types/jasmine": "~4.3.0",
     "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
+    "concurrently": "^9.1.2",
     "jasmine-core": "~4.6.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",

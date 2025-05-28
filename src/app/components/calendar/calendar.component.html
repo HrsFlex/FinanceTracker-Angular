@@ -70,13 +70,13 @@
       <div class="summary-item income">
         <div class="summary-label">Total Income</div>
         <div class="summary-value">
-          {{ monthlyData.totalIncome | currency : "USD" : "symbol" : "1.2-2" }}
+          {{ monthlyData.totalIncome | currency : "INR" : "symbol" : "1.2-2" }}
         </div>
       </div>
       <div class="summary-item expense">
         <div class="summary-label">Total Expenses</div>
         <div class="summary-value">
-          {{ monthlyData.totalExpense | currency : "USD" : "symbol" : "1.2-2" }}
+          {{ monthlyData.totalExpense | currency : "INR" : "symbol" : "1.2-2" }}
         </div>
       </div>
       <div
@@ -86,7 +86,7 @@
       >
         <div class="summary-label">Net Amount</div>
         <div class="summary-value">
-          {{ monthlyNetAmount | currency : "USD" : "symbol" : "1.2-2" }}
+          {{ monthlyNetAmount | currency : "INR" : "symbol" : "1.2-2" }}
         </div>
       </div>
       <div class="summary-item transactions">
@@ -132,13 +132,13 @@
             <div class="income-badge" *ngIf="day.totalIncome > 0">
               <span class="badge-icon">↗</span>
               <span class="badge-amount">{{
-                day.totalIncome | currency : "USD" : "symbol" : "1.0-0"
+                day.totalIncome | currency : "INR" : "symbol" : "1.0-0"
               }}</span>
             </div>
             <div class="expense-badge" *ngIf="day.totalExpense > 0">
               <span class="badge-icon">↘</span>
               <span class="badge-amount">{{
-                day.totalExpense | currency : "USD" : "symbol" : "1.0-0"
+                day.totalExpense | currency : "INR" : "symbol" : "1.0-0"
               }}</span>
             </div>
           </div>
@@ -171,7 +171,7 @@
           >
             Income:
             {{
-              selectedDay.totalIncome | currency : "USD" : "symbol" : "1.2-2"
+              selectedDay.totalIncome | currency : "INR" : "symbol" : "1.2-2"
             }}
           </span>
           <span
@@ -180,7 +180,7 @@
           >
             Expenses:
             {{
-              selectedDay.totalExpense | currency : "USD" : "symbol" : "1.2-2"
+              selectedDay.totalExpense | currency : "INR" : "symbol" : "1.2-2"
             }}
           </span>
           <span
@@ -195,7 +195,7 @@
             Net:
             {{
               selectedDay.totalIncome - selectedDay.totalExpense
-                | currency : "USD" : "symbol" : "1.2-2"
+                | currency : "INR" : "symbol" : "1.2-2"
             }}
           </span>
         </div>
@@ -293,7 +293,7 @@
                 <span class="amount-sign" *ngIf="transaction.type === 'expense'"
                   >-</span
                 >
-                {{ transaction.amount | currency : "USD" : "symbol" : "1.2-2" }}
+                {{ transaction.amount | currency : "INR" : "symbol" : "1.2-2" }}
               </div>
             </div>
             <div class="transaction-meta">
