@@ -75,17 +75,6 @@ export class AccountsItemsComponent implements OnInit {
     this.loadAccounts();
   }
 
-  // public removeAccounts(id: any): void {
-  //   this.accountsService.deleteAccounts(id).subscribe({
-  //     next: () => {
-  //       this.accountsService.notifyAccountsChanged();
-  //       this.resetAndReload();
-  //     },
-  //     error: (error) => {
-  //       console.error('Error deleting account:', error);
-  //     },
-  //   });
-  // }
   deleteAccount(id: any): void {
     this.dialogService
       .confirm(

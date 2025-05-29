@@ -144,9 +144,19 @@
       "name": "Cash",
       "description": "Cash Account",
       "initialAmount": 0,
-      "balance": 500,
+      "balance": 490,
       "createdDate": "2025-05-28",
       "updatedDate": "2025-05-28"
+    },
+    {
+      "id": "4bc7",
+      "name": "Jobs",
+      "description": "tyty",
+      "initialAmount": 0,
+      "balance": 0,
+      "createdDate": "2025-05-28",
+      "updatedDate": "2025-05-28",
+      "isDeleted": true
     }
   ],
   "records": [
@@ -195,6 +205,15 @@
       "description": "testing",
       "amount": 500,
       "date": "2025-05-28T06:29:03.830Z"
+    },
+    {
+      "id": "c7b7",
+      "type": "expense",
+      "fromAccountId": "efc6",
+      "categoryId": "1397",
+      "description": "tests today",
+      "amount": 10,
+      "date": "2025-05-29T05:37:45.971Z"
     }
   ]
 }

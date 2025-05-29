@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { debounceTime } from 'rxjs/operators';
 import { CategoryService } from '../../../services/category-service.service';
 import { Category } from '../entity/category-interface';
+import { DialogService } from 'src/app/services/dialog.service';
 
 @Component({
   selector: 'app-category-list',
@@ -20,7 +21,8 @@ export class CategoryListComponent implements OnInit {
   public typeFilter: 'All' | 'income' | 'expense' = 'All';
 
   constructor(
-    private categoryService: CategoryService // private dialogService DialogService
+    private categoryService: CategoryService,
+    private dialogService: DialogService
   ) {}
 
   public ngOnInit(): void {
@@ -79,16 +81,27 @@ export class CategoryListComponent implements OnInit {
     this.loadCategories();
   }
 
-  public removeCategory(id: any): void {
-    this.categoryService.deleteCategory(id).subscribe({
-      next: () => {
-        this.categoryService.notifyCategoryChanged();
-        this.resetAndReload();
-      },
-      error: (error) => {
-        console.error('Error deleting Category:', error);
-      },
-    });
+  removeCategory(id: any): void {
+    this.dialogService
+      .confirm(
+        'Delete Category?',
+        'Are you sure you want to delete this category? It will be removed from the list but remain in transactions.'
+      )
+      .then((confirmed) => {
+        if (!confirmed) return;
+
+        this.categoryService.deleteCategory(id).subscribe({
+          next: () => {
+            this.categories = this.categories.filter(
+              (category) => category.id !== id
+            );
+            this.dialogService.toast('Category deleted successfully.');
+          },
+          error: (err) => {
+            alert('Error deleting category: ' + err.message);
+          },
+        });
+      });
   }
 
   public filterByType(event: Event): void {
