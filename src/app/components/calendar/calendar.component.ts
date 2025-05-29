@@ -19,15 +19,15 @@ import { DialogService } from 'src/app/services/dialog.service';
 export class CalendarComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  currentDate = new Date();
-  calendarDays: CalendarDay[] = [];
-  selectedDay: CalendarDay | null = null;
-  isLoading = false;
+  public currentDate = new Date();
+  public calendarDays: CalendarDay[] = [];
+  public selectedDay: CalendarDay | null = null;
+  public isLoading = false;
 
-  dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  public dayHeaders = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   // Monthly summary data
-  monthlyData: MonthlyTransactionData = {
+  public monthlyData: MonthlyTransactionData = {
     year: 0,
     month: 0,
     days: [],
@@ -43,7 +43,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
     public dialogService: DialogService
   ) {}
 
-  ngOnInit() {
+  public ngOnInit() {
     this.initializeCalendar();
 
     // Listen for record updates from your existing service
@@ -54,7 +54,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
+  public ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -62,7 +62,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Initialize calendar with current month
    */
-  initializeCalendar() {
+  public initializeCalendar() {
     this.generateCalendar();
     this.loadTransactionsForMonth();
   }
@@ -70,7 +70,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Generate calendar structure for current month
    */
-  generateCalendar() {
+  public generateCalendar() {
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth() + 1; // Convert to 1-based month
 
@@ -82,7 +82,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Navigate to record-upsert component with transaction ID for editing
    */
-  editTransaction(transactionId: string | undefined) {
+  public editTransaction(transactionId: string | undefined) {
     if (transactionId) {
       this.router.navigate(['/record-upsert', transactionId]);
     }
@@ -121,7 +121,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Load transactions for the current month
    */
-  loadTransactionsForMonth() {
+  public loadTransactionsForMonth() {
     this.isLoading = true;
     const year = this.currentDate.getFullYear();
     const month = this.currentDate.getMonth() + 1;
@@ -174,7 +174,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Handle date selection
    */
-  selectDate(day: CalendarDay) {
+  public selectDate(day: CalendarDay) {
     // Reset previous selection
     this.calendarDays.forEach((d) => (d.isSelected = false));
 
@@ -208,7 +208,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Navigate to previous month
    */
-  previousMonth() {
+  public previousMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() - 1);
     this.selectedDay = null;
     this.initializeCalendar();
@@ -217,7 +217,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Navigate to next month
    */
-  nextMonth() {
+  public nextMonth() {
     this.currentDate.setMonth(this.currentDate.getMonth() + 1);
     this.selectedDay = null;
     this.initializeCalendar();
@@ -226,7 +226,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Go to current month (today)
    */
-  goToToday() {
+  public goToToday() {
     this.currentDate = new Date();
     this.selectedDay = null;
     this.initializeCalendar();
@@ -243,7 +243,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Check if current month is the same as today's month
    */
-  isCurrentMonthToday(): boolean {
+  public isCurrentMonthToday(): boolean {
     const today = new Date();
     return (
       this.currentDate.getMonth() === today.getMonth() &&
@@ -285,21 +285,24 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Track by function for calendar days
    */
-  trackByDate(index: number, day: CalendarDay): string {
+  public trackByDate(index: number, day: CalendarDay): string {
     return day.dateString;
   }
 
   /**
    * Track by function for transactions
    */
-  trackByTransactionId(index: number, transaction: DisplayRecord): string {
+  public trackByTransactionId(
+    index: number,
+    transaction: DisplayRecord
+  ): string {
     return transaction.id || index.toString();
   }
 
   /**
    * Get transaction type icon
    */
-  getTransactionIcon(type: string): string {
+  public getTransactionIcon(type: string): string {
     switch (type) {
       case 'income':
         return '↗️';
@@ -315,7 +318,7 @@ export class CalendarComponent implements OnInit, OnDestroy {
   /**
    * Get transaction type class for styling
    */
-  getTransactionClass(type: string): string {
+  public getTransactionClass(type: string): string {
     return `transaction-${type}`;
   }
 }

@@ -220,7 +220,7 @@
       "type": "expense",
       "fromAccountId": "0628",
       "categoryId": "9f20",
-      "description": "servicing",
+      "description": "servicing..",
       "amount": 234,
       "date": "2025-05-29T07:40:22.416Z"
     },

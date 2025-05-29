@@ -41,6 +41,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatMenuModule } from '@angular/material/menu';
 import { NgChartsModule } from 'ng2-charts';
 import { CommonModule, CurrencyPipe, DatePipe } from '@angular/common';
 import { ReportsComponent } from './components/reports/reports.component';
@@ -78,6 +79,7 @@ import { SplashComponent } from './splash/splash.component';
     MatSnackBarModule,
     BrowserModule,
     MatDialogModule,
+    MatMenuModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,

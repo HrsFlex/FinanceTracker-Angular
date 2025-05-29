@@ -97,11 +97,10 @@
   </div>
 
   <!-- Loading State -->
-  <div class="loading-overlay" *ngIf="isLoading">
-    <div class="loading-content">
-      <div class="loading-spinner"></div>
-      <p>Loading transactions...</p>
-    </div>
+
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner"></div>
+    <p>Loading transactions...</p>
   </div>
 
   <!-- Calendar Grid -->
@@ -124,7 +123,7 @@
       (click)="selectDate(day)"
     >
       <div class="day-content">
-        <div class="day-number">{{ day.date.getDate() }}</div>
+        <div class="day-number">{{ day.date | date : "d" }}</div>
 
         <!-- Transaction Indicators -->
         <div class="transaction-indicators" *ngIf="day.transactionCount > 0">
@@ -200,6 +199,33 @@
           </span>
         </div>
       </div>
+
+      <div class="ml-auto flex items-center gap-2">
+        <button>
+          <a
+            [routerLink]="['/record-upsert']"
+            class="bg-green-600 text-white font-medium px-4 py-3 rounded-lg hover:bg-green-700 transition-all transform hover:scale-105 shadow-md hover:shadow-lg flex items-center gap-2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Add Record
+          </a>
+        </button>
+      </div>
+
       <button
         class="close-btn"
         (click)="selectedDay = null"

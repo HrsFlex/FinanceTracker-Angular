@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, forkJoin, of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { map, switchMap, catchError } from 'rxjs/operators';
 import { environment } from 'src/enviroments/environment';
 import {
@@ -39,7 +39,74 @@ export class CalendarService {
   private accountsUrl = environment.baseUrl + '/accounts';
   private categoriesUrl = environment.baseUrl + '/categories';
 
-  constructor(private http: HttpClient) {}
+  // In-memory caches
+  private accountsCache = new Map<string, Accounts>();
+  private categoriesCache = new Map<string, Category>();
+  private accountsFetched = false; // Track if all accounts have been fetched
+  private categoriesFetched = false; // Track if all categories have been fetched
+
+  constructor(private http: HttpClient) {
+    // Preload accounts and categories on service initialization
+    this.preloadAccounts();
+    this.preloadCategories();
+  }
+
+  /**
+   * Preload all accounts to eliminate repeated calls
+   */
+  private preloadAccounts(): void {
+    this.http
+      .get<Accounts[]>(this.accountsUrl)
+      .pipe(
+        map((accounts) => {
+          accounts.forEach((acc) => {
+            if (acc.id) {
+              this.accountsCache.set(acc.id, acc);
+            }
+          });
+          this.accountsFetched = true;
+          console.log(
+            'preloadAccounts: Cached all accounts:',
+            Array.from(this.accountsCache.keys())
+          );
+        }),
+        catchError((error) => {
+          console.error('preloadAccounts: Error preloading accounts:', error);
+          return of([]);
+        })
+      )
+      .subscribe();
+  }
+
+  /**
+   * Preload all categories to eliminate repeated calls
+   */
+  private preloadCategories(): void {
+    this.http
+      .get<Category[]>(this.categoriesUrl)
+      .pipe(
+        map((categories) => {
+          categories.forEach((cat) => {
+            if (cat.id) {
+              this.categoriesCache.set(cat.id, cat);
+            }
+          });
+          this.categoriesFetched = true;
+          console.log(
+            'preloadCategories: Cached all categories:',
+            Array.from(this.categoriesCache.keys())
+          );
+        }),
+        catchError((error) => {
+          console.error(
+            'preloadCategories: Error preloading categories:',
+            error
+          );
+          return of([]);
+        })
+      )
+      .subscribe();
+  }
 
   /**
    * Get all transactions for a specific month and convert them to DisplayRecord format
@@ -48,6 +115,7 @@ export class CalendarService {
     year: number,
     month: number
   ): Observable<DisplayRecord[]> {
+    console.log(`getMonthlyTransactions: Fetching for ${year}-${month}`);
     const startDate = new Date(year, month - 1, 1);
     const endDate = new Date(year, month, 0);
     const startStr = startDate.toISOString().split('T')[0];
@@ -61,11 +129,17 @@ export class CalendarService {
         })
       ),
       switchMap((filteredRecords) => {
+        console.log(
+          `getMonthlyTransactions: Found ${filteredRecords.length} records`
+        );
         if (filteredRecords.length === 0) {
+          console.log(
+            'getMonthlyTransactions: No records, skipping account/category fetch'
+          );
           return of([]);
         }
 
-        // Get all unique account IDs and category IDs
+        // Get unique account and category IDs
         const accountIds = new Set<string>();
         const categoryIds = new Set<string>();
 
@@ -79,33 +153,96 @@ export class CalendarService {
           }
         });
 
-        // Fetch all accounts and categories
-        const accounts$ = this.getAccountsByIds(Array.from(accountIds));
-        const categories$ =
-          categoryIds.size > 0
-            ? this.getCategoriesByIds(Array.from(categoryIds))
-            : of([] as Category[]);
-
-        return forkJoin({
-          accounts: accounts$,
-          categories: categories$,
-        }).pipe(
-          map(({ accounts, categories }) => {
-            // Create lookup maps
-            const accountMap = new Map(accounts.map((acc) => [acc.id!, acc]));
-            const categoryMap = new Map(
-              categories.map((cat) => [cat.id!, cat])
+        // Check if all data is pre-fetched
+        const missingAccountIds = this.accountsFetched
+          ? []
+          : Array.from(accountIds).filter((id) => !this.accountsCache.has(id));
+        const missingCategoryIds = this.categoriesFetched
+          ? []
+          : Array.from(categoryIds).filter(
+              (id) => !this.categoriesCache.has(id)
             );
 
-            // Convert records to DisplayRecord format
-            return filteredRecords.map((record) =>
+        console.log(
+          'getMonthlyTransactions: Missing account IDs:',
+          missingAccountIds
+        );
+        console.log(
+          'getMonthlyTransactions: Missing category IDs:',
+          missingCategoryIds
+        );
+
+        if (missingAccountIds.length === 0 && missingCategoryIds.length === 0) {
+          console.log('getMonthlyTransactions: All data cached, using cache');
+          const accountMap = new Map(
+            Array.from(accountIds).map((id) => [
+              id,
+              this.accountsCache.get(id)!,
+            ])
+          );
+          const categoryMap = new Map(
+            Array.from(categoryIds).map((id) => [
+              id,
+              this.categoriesCache.get(id)!,
+            ])
+          );
+          return of(
+            filteredRecords.map((record) =>
               this.convertToDisplayRecord(record, accountMap, categoryMap)
+            )
+          );
+        }
+
+        // Since we preloaded, this block should rarely execute unless preloading failed
+        console.warn(
+          'getMonthlyTransactions: Preload incomplete, fetching missing data'
+        );
+        return this.getAccountsByIds(missingAccountIds).pipe(
+          switchMap((accounts) => {
+            accounts.forEach((acc) => {
+              if (acc.id) {
+                this.accountsCache.set(acc.id, acc);
+              }
+            });
+            return this.getCategoriesByIds(missingCategoryIds).pipe(
+              map((categories) => {
+                categories.forEach((cat) => {
+                  if (cat.id) {
+                    this.categoriesCache.set(cat.id, cat);
+                  }
+                });
+                console.log(
+                  'getMonthlyTransactions: Updated cache with accounts:',
+                  accounts.map((a) => a.id)
+                );
+                console.log(
+                  'getMonthlyTransactions: Updated cache with categories:',
+                  categories.map((c) => c.id)
+                );
+
+                const accountMap = new Map(
+                  Array.from(accountIds).map((id) => [
+                    id,
+                    this.accountsCache.get(id)!,
+                  ])
+                );
+                const categoryMap = new Map(
+                  Array.from(categoryIds).map((id) => [
+                    id,
+                    this.categoriesCache.get(id)!,
+                  ])
+                );
+
+                return filteredRecords.map((record) =>
+                  this.convertToDisplayRecord(record, accountMap, categoryMap)
+                );
+              })
             );
           })
         );
       }),
       catchError((error) => {
-        console.error('Error fetching monthly transactions:', error);
+        console.error('getMonthlyTransactions: Error fetching records:', error);
         return of([]);
       })
     );
@@ -116,6 +253,7 @@ export class CalendarService {
    */
   getTransactionsForDate(date: Date): Observable<DisplayRecord[]> {
     const dateStr = date.toISOString().split('T')[0];
+    console.log(`getTransactionsForDate: Fetching for ${dateStr}`);
 
     return this.http.get<Record[]>(this.apiUrl).pipe(
       map((records) =>
@@ -125,7 +263,13 @@ export class CalendarService {
         })
       ),
       switchMap((filteredRecords) => {
+        console.log(
+          `getTransactionsForDate: Found ${filteredRecords.length} records`
+        );
         if (filteredRecords.length === 0) {
+          console.log(
+            'getTransactionsForDate: No records, skipping account/category fetch'
+          );
           return of([]);
         }
 
@@ -142,23 +286,40 @@ export class CalendarService {
           }
         });
 
-        const accounts$ = this.getAccountsByIds(Array.from(accountIds));
-        const categories$ =
-          categoryIds.size > 0
-            ? this.getCategoriesByIds(Array.from(categoryIds))
-            : of([] as Category[]);
-
-        return forkJoin({
-          accounts: accounts$,
-          categories: categories$,
-        }).pipe(
-          map(({ accounts, categories }) => {
-            const accountMap = new Map(accounts.map((acc) => [acc.id!, acc]));
-            const categoryMap = new Map(
-              categories.map((cat) => [cat.id!, cat])
+        const missingAccountIds = this.accountsFetched
+          ? []
+          : Array.from(accountIds).filter((id) => !this.accountsCache.has(id));
+        const missingCategoryIds = this.categoriesFetched
+          ? []
+          : Array.from(categoryIds).filter(
+              (id) => !this.categoriesCache.has(id)
             );
 
-            return filteredRecords
+        console.log(
+          'getTransactionsForDate: Missing account IDs:',
+          missingAccountIds
+        );
+        console.log(
+          'getTransactionsForDate: Missing category IDs:',
+          missingCategoryIds
+        );
+
+        if (missingAccountIds.length === 0 && missingCategoryIds.length === 0) {
+          console.log('getTransactionsForDate: All data cached, using cache');
+          const accountMap = new Map(
+            Array.from(accountIds).map((id) => [
+              id,
+              this.accountsCache.get(id)!,
+            ])
+          );
+          const categoryMap = new Map(
+            Array.from(categoryIds).map((id) => [
+              id,
+              this.categoriesCache.get(id)!,
+            ])
+          );
+          return of(
+            filteredRecords
               .map((record) =>
                 this.convertToDisplayRecord(record, accountMap, categoryMap)
               )
@@ -166,13 +327,203 @@ export class CalendarService {
                 (a, b) =>
                   new Date(b.sortDate).getTime() -
                   new Date(a.sortDate).getTime()
-              );
+              )
+          );
+        }
+
+        console.warn(
+          'getTransactionsForDate: Preload incomplete, fetching missing data'
+        );
+        return this.getAccountsByIds(missingAccountIds).pipe(
+          switchMap((accounts) => {
+            accounts.forEach((acc) => {
+              if (acc.id) {
+                this.accountsCache.set(acc.id, acc);
+              }
+            });
+            return this.getCategoriesByIds(missingCategoryIds).pipe(
+              map((categories) => {
+                categories.forEach((cat) => {
+                  if (cat.id) {
+                    this.categoriesCache.set(cat.id, cat);
+                  }
+                });
+                console.log(
+                  'getTransactionsForDate: Updated cache with accounts:',
+                  accounts.map((a) => a.id)
+                );
+                console.log(
+                  'getTransactionsForDate: Updated cache with categories:',
+                  categories.map((c) => c.id)
+                );
+
+                const accountMap = new Map(
+                  Array.from(accountIds).map((id) => [
+                    id,
+                    this.accountsCache.get(id)!,
+                  ])
+                );
+                const categoryMap = new Map(
+                  Array.from(categoryIds).map((id) => [
+                    id,
+                    this.categoriesCache.get(id)!,
+                  ])
+                );
+
+                return filteredRecords
+                  .map((record) =>
+                    this.convertToDisplayRecord(record, accountMap, categoryMap)
+                  )
+                  .sort(
+                    (a, b) =>
+                      new Date(b.sortDate).getTime() -
+                      new Date(a.sortDate).getTime()
+                  );
+              })
+            );
           })
         );
       }),
       catchError((error) => {
-        console.error('Error fetching transactions for date:', error);
+        console.error('getTransactionsForDate: Error fetching records:', error);
         return of([]);
+      })
+    );
+  }
+
+  /**
+   * Get accounts by IDs, using cache if available
+   */
+  private getAccountsByIds(ids: string[]): Observable<Accounts[]> {
+    console.log('getAccountsByIds: Called with IDs:', ids);
+    if (ids.length === 0) {
+      console.log('getAccountsByIds: Empty ID list, returning empty array');
+      return of([]);
+    }
+
+    if (this.accountsFetched) {
+      const cachedAccounts = ids
+        .map((id) => this.accountsCache.get(id))
+        .filter((acc): acc is Accounts => acc !== undefined);
+      console.log(
+        'getAccountsByIds: All accounts pre-fetched, returning cached:',
+        cachedAccounts.map((a) => a.id)
+      );
+      return of(cachedAccounts);
+    }
+
+    const cachedAccounts: Accounts[] = [];
+    const missingIds: string[] = [];
+
+    ids.forEach((id) => {
+      const cachedAccount = this.accountsCache.get(id);
+      if (cachedAccount) {
+        cachedAccounts.push(cachedAccount);
+      } else {
+        missingIds.push(id);
+      }
+    });
+
+    console.log(
+      'getAccountsByIds: Cached accounts:',
+      cachedAccounts.map((a) => a.id)
+    );
+    console.log('getAccountsByIds: Missing IDs:', missingIds);
+
+    if (missingIds.length === 0) {
+      console.log('getAccountsByIds: All accounts cached, returning cache');
+      return of(cachedAccounts);
+    }
+
+    // Fetch all accounts since JSON Server doesn't support bulk ID fetching
+    return this.http.get<Accounts[]>(this.accountsUrl).pipe(
+      map((accounts) => {
+        accounts.forEach((acc) => {
+          if (acc.id) {
+            this.accountsCache.set(acc.id, acc);
+          }
+        });
+        this.accountsFetched = true;
+        console.log(
+          'getAccountsByIds: Cached all accounts:',
+          Array.from(this.accountsCache.keys())
+        );
+        return ids
+          .map((id) => this.accountsCache.get(id))
+          .filter((acc): acc is Accounts => acc !== undefined);
+      }),
+      catchError((error) => {
+        console.error('getAccountsByIds: Error fetching accounts:', error);
+        console.log('getAccountsByIds: Returning cached accounts');
+        return of(cachedAccounts);
+      })
+    );
+  }
+
+  /**
+   * Get categories by IDs, using cache if available
+   */
+  private getCategoriesByIds(ids: string[]): Observable<Category[]> {
+    console.log('getCategoriesByIds: Called with IDs:', ids);
+    if (ids.length === 0) {
+      console.log('getCategoriesByIds: Empty ID list, returning empty array');
+      return of([]);
+    }
+
+    if (this.categoriesFetched) {
+      const cachedCategories = ids
+        .map((id) => this.categoriesCache.get(id))
+        .filter((cat): cat is Category => cat !== undefined);
+      console.log(
+        'getCategoriesByIds: All categories pre-fetched, returning cached:',
+        cachedCategories.map((c) => c.id)
+      );
+      return of(cachedCategories);
+    }
+
+    const cachedCategories: Category[] = [];
+    const missingIds: string[] = [];
+
+    ids.forEach((id) => {
+      const cachedCategory = this.categoriesCache.get(id);
+      if (cachedCategory) {
+        cachedCategories.push(cachedCategory);
+      } else {
+        missingIds.push(id);
+      }
+    });
+
+    console.log(
+      'getCategoriesByIds: Cached categories:',
+      cachedCategories.map((c) => c.id)
+    );
+    console.log('getCategoriesByIds: Missing IDs:', missingIds);
+
+    if (missingIds.length === 0) {
+      console.log('getCategoriesByIds: All categories cached, returning cache');
+      return of(cachedCategories);
+    }
+
+    return this.http.get<Category[]>(this.categoriesUrl).pipe(
+      map((categories) => {
+        this.categoriesFetched = true;
+        categories.forEach((cat) => {
+          if (cat.id) {
+            this.categoriesCache.set(cat.id, cat);
+          }
+        });
+        console.log(
+          'getCategoriesByIds: Cached all categories:',
+          Array.from(this.categoriesCache.keys())
+        );
+        return ids
+          .map((id) => this.categoriesCache.get(id))
+          .filter((cat): cat is Category => cat !== undefined);
+      }),
+      catchError((error) => {
+        console.error('getCategoriesByIds: Error fetching categories:', error);
+        console.log('getCategoriesByIds: Returning cached categories');
+        return of(cachedCategories);
       })
     );
   }
@@ -183,15 +534,10 @@ export class CalendarService {
   generateCalendarDays(year: number, month: number): CalendarDay[] {
     const firstDay = new Date(year, month - 1, 1);
     const lastDay = new Date(year, month, 0);
-
-    // Start from the beginning of the week containing the first day
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - startDate.getDay());
-
-    // End at the end of the week containing the last day
     const endDate = new Date(lastDay);
     endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
-
     const today = new Date();
     const days: CalendarDay[] = [];
 
@@ -225,7 +571,6 @@ export class CalendarService {
     days: CalendarDay[],
     transactions: DisplayRecord[]
   ): CalendarDay[] {
-    // Reset all days
     days.forEach((day) => {
       day.transactions = [];
       day.totalIncome = 0;
@@ -233,7 +578,6 @@ export class CalendarService {
       day.transactionCount = 0;
     });
 
-    // Group transactions by date
     transactions.forEach((transaction) => {
       const transactionDate = new Date(transaction.sortDate);
       const day = days.find((d) => this.isSameDate(d.date, transactionDate));
@@ -241,7 +585,6 @@ export class CalendarService {
       if (day) {
         day.transactions.push(transaction);
         day.transactionCount++;
-
         if (transaction.type === 'income') {
           day.totalIncome += transaction.amount;
         } else if (transaction.type === 'expense') {
@@ -250,7 +593,6 @@ export class CalendarService {
       }
     });
 
-    // Sort transactions within each day by time (newest first)
     days.forEach((day) => {
       day.transactions.sort(
         (a, b) =>
@@ -259,34 +601,6 @@ export class CalendarService {
     });
 
     return days;
-  }
-
-  private getAccountsByIds(ids: string[]): Observable<Accounts[]> {
-    if (ids.length === 0) {
-      return of([]);
-    }
-
-    const requests = ids.map((id) =>
-      this.http
-        .get<Accounts>(`${this.accountsUrl}/${id}`)
-        .pipe(catchError(() => of(null)))
-    );
-
-    return forkJoin(requests).pipe(
-      map((accounts) => accounts.filter((acc) => acc !== null) as Accounts[])
-    );
-  }
-
-  private getCategoriesByIds(ids: string[]): Observable<Category[]> {
-    if (ids.length === 0) {
-      return of([]);
-    }
-
-    return this.http
-      .get<Category[]>(`${this.categoriesUrl}`)
-      .pipe(
-        map((categories) => categories.filter((cat) => ids.includes(cat.id!)))
-      );
   }
 
   private convertToDisplayRecord(
@@ -302,7 +616,6 @@ export class CalendarService {
       ? categoryMap.get(record.categoryId)
       : undefined;
 
-    // Parse the date and format it
     const recordDate = new Date(record.date);
     const formattedDate = recordDate.toLocaleDateString('en-US', {
       year: 'numeric',
