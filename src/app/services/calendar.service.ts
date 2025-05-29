@@ -282,17 +282,11 @@ export class CalendarService {
       return of([]);
     }
 
-    const requests = ids.map((id) =>
-      this.http
-        .get<Category>(`${this.categoriesUrl}/${id}`)
-        .pipe(catchError(() => of(null)))
-    );
-
-    return forkJoin(requests).pipe(
-      map(
-        (categories) => categories.filter((cat) => cat !== null) as Category[]
-      )
-    );
+    return this.http
+      .get<Category[]>(`${this.categoriesUrl}`)
+      .pipe(
+        map((categories) => categories.filter((cat) => ids.includes(cat.id!)))
+      );
   }
 
   private convertToDisplayRecord(

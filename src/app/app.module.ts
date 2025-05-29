@@ -6,8 +6,6 @@ import { AppComponent } from './app.component';
 
 import { RouterModule } from '@angular/router';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { LoginComponent } from './pages/login/login.component';
-import { NavBarComponent } from './components/nav-bar/nav-bar.component';
 
 import { CategoryListComponent } from './components/category/category-list/category-list.component';
 import { CategoryUpsertComponent } from './components/category/category-upsert/category-upsert.component';
@@ -25,7 +23,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
 import { MatCardModule } from '@angular/material/card';
-import { HomeComponent } from './pages/home/home.component';
 import { AddExpenseComponent } from './components/add-expense/add-expense.component';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
 import { RecordsComponent } from './components/records/record-list/records.component';
@@ -42,7 +39,6 @@ import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { ProfileComponent } from './components/profile/profile.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { group } from '@angular/animations';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { NgChartsModule } from 'ng2-charts';
@@ -55,9 +51,6 @@ import { SplashComponent } from './splash/splash.component';
 @NgModule({
   declarations: [
     AppComponent,
-    LoginComponent,
-    NavBarComponent,
-    HomeComponent,
     CategoryListComponent,
     CategoryUpsertComponent,
     AccountsItemsComponent,

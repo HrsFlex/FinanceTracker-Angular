@@ -99,7 +99,7 @@
       "name": "SBI",
       "description": "State Bank",
       "initialAmount": 121,
-      "balance": 3234,
+      "balance": 2800,
       "createdDate": "2025-05-12",
       "updatedDate": "2025-05-12"
     },
@@ -214,6 +214,24 @@
       "description": "tests today",
       "amount": 10,
       "date": "2025-05-29T05:37:45.971Z"
+    },
+    {
+      "id": "af34",
+      "type": "expense",
+      "fromAccountId": "0628",
+      "categoryId": "9f20",
+      "description": "servicing",
+      "amount": 234,
+      "date": "2025-05-29T07:40:22.416Z"
+    },
+    {
+      "id": "6243",
+      "type": "expense",
+      "fromAccountId": "0628",
+      "categoryId": "1397",
+      "description": "april test",
+      "amount": 200,
+      "date": "2025-04-15T13:51:00Z"
     }
   ]
 }
