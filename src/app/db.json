@@ -99,7 +99,7 @@
       "name": "SBI",
       "description": "State Bank",
       "initialAmount": 121,
-      "balance": 2800,
+      "balance": 12800,
       "createdDate": "2025-05-12",
       "updatedDate": "2025-05-12"
     },
@@ -126,7 +126,7 @@
       "name": "Savings Account",
       "description": "HDFC",
       "initialAmount": 0,
-      "balance": 1300,
+      "balance": 1000,
       "updatedDate": "2025-05-28",
       "id": "af1a"
     },
@@ -144,7 +144,7 @@
       "name": "Cash",
       "description": "Cash Account",
       "initialAmount": 0,
-      "balance": 490,
+      "balance": 390,
       "createdDate": "2025-05-28",
       "updatedDate": "2025-05-28"
     },
@@ -160,15 +160,6 @@
     }
   ],
   "records": [
-    {
-      "id": "8f4b",
-      "type": "income",
-      "fromAccountId": "af1a",
-      "categoryId": null,
-      "description": "Shopping",
-      "amount": 300,
-      "date": "2025-05-26T13:35:57.191Z"
-    },
     {
       "id": "cb0e",
       "type": "expense",
@@ -232,6 +223,24 @@
       "description": "april test",
       "amount": 200,
       "date": "2025-04-15T13:51:00Z"
+    },
+    {
+      "id": "9f7f",
+      "type": "expense",
+      "fromAccountId": "efc6",
+      "categoryId": "9f20",
+      "description": "Shopping",
+      "amount": 100,
+      "date": "2025-05-29T13:19:28.216Z"
+    },
+    {
+      "id": "79f4",
+      "type": "income",
+      "fromAccountId": "0628",
+      "categoryId": "8d2c",
+      "description": "income",
+      "amount": 10000,
+      "date": "2025-05-30T10:13:57.274Z"
     }
   ]
 }

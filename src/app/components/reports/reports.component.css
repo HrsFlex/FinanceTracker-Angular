@@ -1,37 +1,123 @@
-@import 'tailwindcss/base';
-@import 'tailwindcss/components';
-@import 'tailwindcss/utilities';
+/* reports.component.css */
 
-table {
-    @apply shadow-md rounded-lg overflow-hidden;
+/* Material Form Field Styling */
+mat-form-field {
+    width: 100%;
 }
 
-th,
-td {
-    @apply px-4 py-2 text-left;
+mat-select,
+mat-form-field input {
+    color: #1e293b;
+    /* text-slate-800 */
+    background-color: #ffffff;
+    /* bg-white */
+    border-color: #e5e7eb;
+    /* border-gray-200 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    transition: all 0.2s ease;
 }
 
-th {
-    @apply bg-gray-200 font-semibold;
+mat-select:focus,
+mat-form-field input:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #2563eb;
+    /* focus:ring-2 focus:ring-blue-600 */
 }
 
-tr:nth-child(even) {
-    @apply bg-gray-50;
+.dark mat-select,
+.dark mat-form-field input {
+    color: #1e293b;
+    /* dark:text-slate-800 */
+    background-color: #ffffff;
+    /* dark:bg-white */
+    border-color: #e5e7eb;
+    /* dark:border-gray-200 */
 }
 
-button:disabled {
-    @apply opacity-50 cursor-not-allowed;
+.dark mat-select:focus,
+.dark mat-form-field input:focus {
+    box-shadow: 0 0 0 2px #1e40af;
+    /* focus:ring-2 focus:ring-blue-800 */
 }
 
+mat-datepicker-toggle {
+    color: #6b7280;
+    /* text-gray-500 */
+}
+
+.dark mat-datepicker-toggle {
+    color: #6b7280;
+    /* dark:text-gray-500 */
+}
+
+/* Button */
+button[mat-raised-button] {
+    background-color: #2563eb;
+    /* bg-blue-600 */
+    color: #ffffff;
+    /* text-white */
+    padding: 0.5rem 1rem;
+    /* px-4 py-2 */
+    border-radius: 0.5rem;
+    /* rounded-lg */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* shadow-md */
+    transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button[mat-raised-button]:hover {
+    background-color: #1e40af;
+    /* hover:bg-blue-800 */
+    transform: scale(1.05);
+    /* hover:scale-105 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+button[mat-raised-button]:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px #2563eb;
+    /* focus:ring-2 focus:ring-blue-600 */
+}
+
+button[mat-raised-button]:disabled {
+    opacity: 0.5;
+    /* disabled:opacity-50 */
+    cursor: not-allowed;
+    /* disabled:cursor-not-allowed */
+    transform: none;
+    /* disabled:transform-none */
+}
+
+.dark button[mat-raised-button] {
+    background-color: #1e40af;
+    /* dark:bg-blue-800 */
+}
+
+.dark button[mat-raised-button]:hover {
+    background-color: #2563eb;
+    /* dark:hover:bg-blue-600 */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.dark button[mat-raised-button]:focus {
+    box-shadow: 0 0 0 2px #1e40af;
+    /* dark:focus:ring-blue-800 */
+}
+
+/* Accessibility Focus States */
+:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px #2563eb;
+    /* ring-2 ring-blue-600 */
+}
+
+.dark :focus-visible {
+    box-shadow: 0 0 0 2px #1e40af;
+    /* dark:ring-blue-800 */
+}
+
+/* Chart Animation */
 canvas {
-    @apply rounded-lg shadow-md w-full;
-    min-height: 400px;
-}
-
-.text-green-600 {
-    @apply bg-green-100 px-2 py-1 rounded-full;
-}
-
-.text-red-600 {
-    @apply bg-red-100 px-2 py-1 rounded-full;
+    animation: fade-in 0.5s ease-out forwards;
 }

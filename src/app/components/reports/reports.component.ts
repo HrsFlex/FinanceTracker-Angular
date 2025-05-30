@@ -9,19 +9,26 @@ import {
   Record,
   CategoryOption,
 } from '../records/entity/record-interface';
-import { Chart, registerables } from 'chart.js';
+import { Chart } from 'chart.js';
 import { debounceTime } from 'rxjs/operators';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { DatePipe } from '@angular/common';
 import { MatDatepickerInputEvent } from '@angular/material/datepicker';
 
-interface ReportSummary {
-  date: string;
-  income: number;
-  expense: number;
-  transfer: number;
-  net: number;
+// Declare jsPDF extension for jspdf-autotable
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable: {
+      finalY: number;
+    };
+  }
+}
+
+interface CategorySummary {
+  category: string;
+  amount: number;
+  percentage: number;
 }
 
 @Component({
@@ -32,18 +39,18 @@ interface ReportSummary {
 })
 export class ReportsComponent implements OnInit, AfterViewInit {
   reportForm: FormGroup;
-  categories: CategoryOption[] = [
-    { value: 'all', label: 'All' },
-    { value: 'transfer', label: 'Transfer' },
-  ];
+  categories: CategoryOption[] = [];
   accounts: Accounts[] = [];
   records: Record[] = [];
-  reportType: 'daily' | 'weekly' | 'monthly' | 'custom' = 'weekly'; // Default to weekly for more data
+  reportType: 'weekly' | 'monthly' | 'custom' = 'weekly';
   customDateRange: { start: Date | null; end: Date | null } = {
     start: null,
     end: null,
   };
-  summaries: ReportSummary[] = [];
+  categorySummaries: CategorySummary[] = [];
+  totalExpenses: number = 0;
+  highestCategory: CategoryOption | null = null;
+  insights: string[] = [];
   lastUpdated: string = new Date().toLocaleTimeString();
   loading = false;
   chart: Chart | null = null;
@@ -55,11 +62,9 @@ export class ReportsComponent implements OnInit, AfterViewInit {
     private recordService: RecordService,
     private datePipe: DatePipe
   ) {
-    Chart.register(...registerables);
     this.reportForm = this.fb.group({
       accountId: ['all'],
-      categoryId: ['all'],
-      type: ['all'],
+      reportType: ['weekly'],
     });
   }
 
@@ -73,7 +78,7 @@ export class ReportsComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.renderSummaryChart();
+    this.renderCategoryChart();
   }
 
   private loadData(): void {
@@ -81,16 +86,11 @@ export class ReportsComponent implements OnInit, AfterViewInit {
     // Load categories
     this.categoryService.getCategories(1, 100, 'name', 'All').subscribe({
       next: ({ categories }) => {
-        this.categories = [
-          { value: 'all', label: 'All' },
-          { value: 'transfer', label: 'Transfer' },
-          ...categories.map((cat) => ({
-            value: cat.id!,
-            label: cat.name,
-            type: cat.type.toLowerCase() as 'income' | 'expense' | 'transfer',
-          })),
-        ];
-        console.log('Loaded categories:', this.categories);
+        this.categories = categories.map((cat) => ({
+          value: cat.id!,
+          label: cat.name,
+          type: cat.type.toLowerCase() as 'income' | 'expense' | 'transfer',
+        }));
         this.loadReports();
       },
       error: (err) => {
@@ -106,7 +106,6 @@ export class ReportsComponent implements OnInit, AfterViewInit {
           { id: 'all', name: 'All Accounts', balance: 0, isDeleted: false },
           ...accounts.filter((acc) => !acc.isDeleted),
         ];
-        console.log('Loaded accounts:', this.accounts);
         this.loadReports();
       },
       error: (err) => {
@@ -114,33 +113,37 @@ export class ReportsComponent implements OnInit, AfterViewInit {
         this.loading = false;
       },
     });
-
-    // Load records
-    this.loadReports();
   }
 
   private loadReports(): void {
     this.loading = true;
-    const { type } = this.reportForm.value;
-    this.recordService.getRecordsDashBoard(1, 100, 'date', type).subscribe({
-      next: ({ records }) => {
-        console.log('Fetched records:', records);
-        this.records = records;
-        this.summaries = this.generateSummaries(this.filterRecords(records));
-        console.log('Generated summaries:', this.summaries);
-        this.renderSummaryChart();
-        this.loading = false;
-      },
-      error: (err) => {
-        console.error('Failed to load records', err);
-        this.loading = false;
-      },
-    });
+    this.recordService
+      .getRecordsDashBoard(1, 100, 'date', 'expense')
+      .subscribe({
+        next: ({ records }) => {
+          this.records = records;
+          this.categorySummaries = this.generateCategorySummaries(
+            this.filterRecords(records)
+          );
+          this.totalExpenses = this.categorySummaries.reduce(
+            (sum, s) => sum + s.amount,
+            0
+          );
+          this.highestCategory = this.findHighestCategory();
+          this.generateInsights();
+          this.renderCategoryChart();
+          this.loading = false;
+        },
+        error: (err) => {
+          console.error('Failed to load records', err);
+          this.loading = false;
+        },
+      });
   }
 
   private filterRecords(records: Record[]): Record[] {
-    const { accountId, categoryId } = this.reportForm.value;
-    let filtered = records;
+    const { accountId } = this.reportForm.value;
+    let filtered = records.filter((r) => r.type === 'expense');
 
     if (accountId !== 'all') {
       filtered = filtered.filter(
@@ -148,22 +151,7 @@ export class ReportsComponent implements OnInit, AfterViewInit {
       );
     }
 
-    if (categoryId !== 'all') {
-      if (categoryId === 'transfer') {
-        filtered = filtered.filter((r) => r.type === 'transfer');
-      } else {
-        filtered = filtered.filter(
-          (r) => r.categoryId === categoryId && r.categoryId !== '0'
-        );
-      }
-    }
-
-    if (this.reportType === 'daily') {
-      const today = this.datePipe.transform(new Date(), 'yyyy-MM-dd')!;
-      filtered = filtered.filter(
-        (r) => this.datePipe.transform(r.date, 'yyyy-MM-dd') === today
-      );
-    } else if (this.reportType === 'weekly') {
+    if (this.reportType === 'weekly') {
       const startOfWeek = new Date();
       startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
       const endOfWeek = new Date(startOfWeek);
@@ -193,7 +181,6 @@ export class ReportsComponent implements OnInit, AfterViewInit {
       );
     }
 
-    console.log('Filtered records:', filtered);
     return filtered;
   }
 
@@ -208,56 +195,75 @@ export class ReportsComponent implements OnInit, AfterViewInit {
     });
   }
 
-  private generateSummaries(records: Record[]): ReportSummary[] {
-    const summaries: { [key: string]: ReportSummary } = {};
+  private generateCategorySummaries(records: Record[]): CategorySummary[] {
+    const summaries: { [key: string]: CategorySummary } = {};
 
     records.forEach((record) => {
-      let key: string;
-      if (this.reportType === 'daily') {
-        key = this.datePipe.transform(record.date, 'yyyy-MM-dd')!;
-      } else if (this.reportType === 'weekly') {
-        const date = new Date(record.date);
-        const startOfWeek = new Date(date);
-        startOfWeek.setDate(date.getDate() - date.getDay());
-        key = this.datePipe.transform(startOfWeek, 'yyyy-MM-dd')!;
-      } else {
-        key = this.datePipe.transform(record.date, 'yyyy-MM')!;
+      const category =
+        this.categories.find((c) => c.value === record.categoryId)?.label ||
+        'Uncategorized';
+      if (!summaries[category]) {
+        summaries[category] = { category, amount: 0, percentage: 0 };
       }
-
-      if (!summaries[key]) {
-        summaries[key] = {
-          date: key,
-          income: 0,
-          expense: 0,
-          transfer: 0,
-          net: 0,
-        };
-      }
-
-      if (record.type === 'income') {
-        summaries[key].income += record.amount;
-      } else if (record.type === 'expense') {
-        summaries[key].expense += record.amount;
-      } else {
-        summaries[key].transfer += record.amount;
-      }
-      summaries[key].net = summaries[key].income - summaries[key].expense;
+      summaries[category].amount += record.amount;
     });
 
-    return Object.values(summaries).sort((a, b) =>
-      a.date.localeCompare(b.date)
+    const total = Object.values(summaries).reduce(
+      (sum, s) => sum + s.amount,
+      0
     );
+    Object.values(summaries).forEach((s) => {
+      s.percentage = total > 0 ? (s.amount / total) * 100 : 0;
+    });
+
+    return Object.values(summaries).sort((a, b) => b.amount - a.amount);
   }
 
-  private renderSummaryChart(): void {
-    console.log('Rendering chart with summaries:', this.summaries);
+  private findHighestCategory(): CategoryOption | null {
+    if (this.categorySummaries.length === 0) return null;
+    const highest = this.categorySummaries[0];
+    return this.categories.find((c) => c.label === highest.category) || null;
+  }
+
+  private generateInsights(): void {
+    this.insights = [];
+    if (this.totalExpenses > 0) {
+      const highSpending = this.categorySummaries.filter(
+        (s) => s.percentage > 30
+      );
+      if (highSpending.length > 0) {
+        highSpending.forEach((s) => {
+          this.insights.push(
+            `Category "${s.category}" accounts for ${s.percentage.toFixed(
+              1
+            )}% of your expenses. Consider reviewing your spending in this area to identify potential savings.`
+          );
+        });
+      } else {
+        this.insights.push(
+          'Your spending is well-distributed across categories. Keep monitoring to maintain balance.'
+        );
+      }
+      if (this.categorySummaries.length > 5) {
+        this.insights.push(
+          'You have expenses in multiple categories. Consolidating spending into fewer categories may simplify budgeting.'
+        );
+      }
+    } else {
+      this.insights.push(
+        'No expense data available for the selected period. Try adjusting the filters.'
+      );
+    }
+  }
+
+  private renderCategoryChart(): void {
     const ctx = document.getElementById('reportChart') as HTMLCanvasElement;
     if (!ctx) {
       console.error('Canvas element with ID "reportChart" not found');
       return;
     }
 
-    if (this.summaries.length === 0) {
+    if (this.categorySummaries.length === 0) {
       console.warn('No data available for chart');
       return;
     }
@@ -267,36 +273,31 @@ export class ReportsComponent implements OnInit, AfterViewInit {
     }
 
     this.chart = new Chart(ctx, {
-      type: 'bar',
+      type: 'pie',
       data: {
-        labels: this.summaries.map((s) => s.date),
+        labels: this.categorySummaries.map((s) => s.category),
         datasets: [
           {
-            label: 'Income',
-            data: this.summaries.map((s) => s.income),
-            backgroundColor: 'rgba(16, 185, 129, 0.8)',
-            borderColor: 'rgba(16, 185, 129, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Expense',
-            data: this.summaries.map((s) => s.expense),
-            backgroundColor: 'rgba(239, 68, 68, 0.8)',
-            borderColor: 'rgba(239, 68, 68, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Transfer',
-            data: this.summaries.map((s) => s.transfer),
-            backgroundColor: 'rgba(59, 130, 246, 0.8)',
-            borderColor: 'rgba(59, 130, 246, 1)',
-            borderWidth: 1,
-          },
-          {
-            label: 'Net',
-            data: this.summaries.map((s) => s.net),
-            backgroundColor: 'rgba(255, 206, 86, 0.8)',
-            borderColor: 'rgba(255, 206, 86, 1)',
+            label: 'Expenses by Category',
+            data: this.categorySummaries.map((s) => s.amount),
+            backgroundColor: [
+              '#10B981', // Emerald
+              '#EF4444', // Red
+              '#3B82F6', // Blue
+              '#F59E0B', // Amber
+              '#8B5CF6', // Purple
+              '#EC4899', // Pink
+              '#6B7280', // Gray
+            ],
+            borderColor: [
+              '#064E3B', // Dark Emerald
+              '#991B1B', // Dark Red
+              '#1E3A8A', // Dark Blue
+              '#B45309', // Dark Amber
+              '#5B21B6', // Dark Purple
+              '#9D174D', // Dark Pink
+              '#4B5563', // Dark Gray
+            ],
             borderWidth: 1,
           },
         ],
@@ -304,37 +305,34 @@ export class ReportsComponent implements OnInit, AfterViewInit {
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: true,
-            title: { display: true, text: 'Amount ($)' },
-          },
-          x: {
-            title: {
-              display: true,
-              text:
-                this.reportType === 'daily'
-                  ? 'Date'
-                  : this.reportType === 'weekly'
-                  ? 'Week Starting'
-                  : 'Month',
-            },
-          },
-        },
         plugins: {
           legend: {
-            position: 'top',
+            position: 'right',
             labels: { font: { size: 12, family: 'Inter' } },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const value = context.parsed || 0;
+                const total = context.dataset.data.reduce(
+                  (sum, val) => sum + val,
+                  0
+                );
+                const percentage =
+                  total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                return `${context.label}: $${value.toFixed(
+                  2
+                )} (${percentage}%)`;
+              },
+            },
           },
         },
       },
     });
   }
 
-  setReportType(type: 'daily' | 'weekly' | 'monthly' | 'custom'): void {
+  setReportType(type: 'weekly' | 'monthly' | 'custom'): void {
     this.reportType = type;
-    this.reportForm.patchValue({ reportType: type });
-    console.log('Report type set to:', type);
     this.loadReports();
   }
 
@@ -355,27 +353,33 @@ export class ReportsComponent implements OnInit, AfterViewInit {
   downloadPDF(): void {
     const doc = new jsPDF();
     doc.text(
-      `Financial Report - ${
+      `Expense Report by Category - ${
         this.reportType.charAt(0).toUpperCase() + this.reportType.slice(1)
       }`,
       10,
       10
     );
     autoTable(doc, {
-      head: [['Date', 'Income', 'Expense', 'Transfer', 'Net']],
-      body: this.summaries.map((s) => [
-        s.date,
-        s.income.toFixed(2),
-        s.expense.toFixed(2),
-        s.transfer.toFixed(2),
-        s.net.toFixed(2),
+      head: [['Category', 'Amount', '% of Total']],
+      body: this.categorySummaries.map((s) => [
+        s.category,
+        s.amount.toFixed(2),
+        s.percentage.toFixed(1) + '%',
       ]),
       startY: 20,
       styles: { fontSize: 10 },
       headStyles: { fillColor: [16, 185, 129] },
     });
+    doc.text('Spending Insights', 10, doc.lastAutoTable.finalY + 10);
+    autoTable(doc, {
+      body: this.insights.map((insight) => [insight]),
+      startY: doc.lastAutoTable.finalY + 20,
+      styles: { fontSize: 10 },
+    });
     doc.save(
-      `report-${this.reportType}-${new Date().toISOString().split('T')[0]}.pdf`
+      `expense-report-${this.reportType}-${
+        new Date().toISOString().split('T')[0]
+      }.pdf`
     );
   }
 
